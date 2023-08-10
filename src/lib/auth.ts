@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         async session({ token, session }) {
             if (token) {
                 session.user.id = token.id
-                session.user.username = token.username
+                session.user.name = token.username
                 session.user.email = token.email
             }
 
@@ -30,22 +30,23 @@ export const authOptions: NextAuthOptions = {
         },
         async jwt({ token, user }) {
             const dbUser = await db.user.findFirst({
-                where: { email: token.email }
+                where: { id: token.id }
             })
 
             if (!dbUser) {
+                //user sometimes undefined???
                 token.id = user.id
                 return token
             }
 
-            if (!dbUser.username) {
+            if (!dbUser.name) {
                 console.log("generating username")
                 await db.user.update({
                     where: {
                         id: dbUser.id
                     },
                     data: {
-                        username: nanoid(10)
+                        name: nanoid(10)
                     }
                 })
             }
@@ -53,7 +54,7 @@ export const authOptions: NextAuthOptions = {
             return {
                 id: dbUser.id,
                 email: dbUser.email,
-                username: dbUser.username
+                username: dbUser.name
             }
         }
     }
