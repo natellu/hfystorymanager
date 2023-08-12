@@ -2,6 +2,7 @@ import { getAuthSession } from "@/lib/auth"
 import Link from "next/link"
 import UserAccountNav from "./UserAccountNav"
 import { buttonVariants } from "./ui/Button"
+import SearchBar from "./SearchBar"
 
 const Navbar = async () => {
     const session = await getAuthSession()
@@ -17,7 +18,7 @@ const Navbar = async () => {
                 </Link>
 
                 {/* Searchbar */}
-                {/* <SearchBar /> */}
+                <SearchBar />
 
                 {/* Auth */}
                 {session?.user ? (
