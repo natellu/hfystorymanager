@@ -84,15 +84,15 @@ const SearchBar: FC<SearchBarProps> = ({}) => {
                         <CommandGroup heading="Stories">
                             {queryResults?.map((story) => (
                                 <CommandItem
-                                    onSelect={(e) => {
-                                        router.push(`/s/${e}`)
+                                    onSelect={() => {
+                                        router.push(`/story/${story.id}`)
                                         router.refresh()
                                     }}
                                     key={story.id}
                                     value={story.title}
                                 >
                                     <Users className="mr-2 h-4 w-4" />
-                                    <a href={`/s/${story.title}`} className="">
+                                    <a href={`/story/${story.id}`} className="">
                                         {story.title}
                                     </a>
                                 </CommandItem>
