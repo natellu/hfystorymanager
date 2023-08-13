@@ -9,9 +9,13 @@ import Story from "./Story"
 
 interface StoryFeedProps {
     initialStorys: ExtendedStory[]
+    subscribed?: boolean
 }
 
-const StoryFeed: FC<StoryFeedProps> = ({ initialStorys }) => {
+const StoryFeed: FC<StoryFeedProps> = ({
+    initialStorys,
+    subscribed = false
+}) => {
     const lastStoryRef = useRef<HTMLElement>(null)
     const { ref, entry } = useIntersection({
         root: lastStoryRef.current,
@@ -21,7 +25,8 @@ const StoryFeed: FC<StoryFeedProps> = ({ initialStorys }) => {
     const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
         ["infinite-query"],
         async ({ pageParam = 1 }) => {
-            const query = `/api/stories?limit=${INFINITE_SCROLLING_PAGINATION_RESULTS}&page=${pageParam}`
+            const query = `/api/stories?limit=${INFINITE_SCROLLING_PAGINATION_RESULTS}&page=${pageParam}&subscribed=${subscribed}`
+
             const { data } = await axios.get(query)
 
             return data as ExtendedStory[]
@@ -48,7 +53,7 @@ const StoryFeed: FC<StoryFeedProps> = ({ initialStorys }) => {
             {stories.map((story, index) => {
                 if (index === stories.length - 1)
                     return (
-                        <li key={story.id} ref={ref}>
+                        <li key={story.id} ref={ref} className="list-none">
                             <Story story={story} />
                         </li>
                     )

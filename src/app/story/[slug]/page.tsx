@@ -24,7 +24,7 @@ const page = async ({ params: { slug } }: pageProps) => {
 
     if (!story) return notFound()
 
-    return <Story story={story} />
+    return <Story story={story} showSubscribe={true} />
 }
 
 export default page

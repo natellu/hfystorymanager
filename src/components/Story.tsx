@@ -1,4 +1,6 @@
-import { FC } from "react"
+"use client"
+
+import { FC, useEffect, useState } from "react"
 import {
     Card,
     CardContent,
@@ -8,16 +10,59 @@ import {
     CardTitle
 } from "./ui/Card"
 import { ExtendedStory } from "@/types/db"
+import { Button } from "./ui/Button"
+import { CheckCheck } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import axios from "axios"
+import { SubscribeToStoryPayload } from "@/lib/validators/story"
+import SubscribeLeaveToggle from "./SubscribeLeaveToggle"
 
 interface StoryProps {
     story: ExtendedStory
+    showSubscribe?: boolean
 }
 
-const Story: FC<StoryProps> = ({ story }) => {
+const Story: FC<StoryProps> = ({ story, showSubscribe }) => {
+    const { data: session } = useSession()
+    const router = useRouter()
+    const [isSubscribed, setIsSubscribed] = useState(false)
+
+    useEffect(() => {
+        if (session && showSubscribe) {
+            const fetchData = async () => {
+                const payload: SubscribeToStoryPayload = {
+                    storyId: story.id
+                }
+
+                const { data } = await axios.post(
+                    "/api/story/isSubscribed",
+                    payload
+                )
+
+                if (data === story.id) {
+                    setIsSubscribed(true)
+                } else {
+                    setIsSubscribed(false)
+                }
+            }
+
+            fetchData()
+        }
+    }, [session])
+
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{story.title}</CardTitle>
+                <CardTitle className="flex justify-between">
+                    <a href={`/story/${story.id}`}>{story.title}</a>{" "}
+                    {showSubscribe ? (
+                        <SubscribeLeaveToggle
+                            storyId={story.id}
+                            isSubscribed={isSubscribed}
+                        />
+                    ) : null}
+                </CardTitle>
                 <CardDescription>
                     Author:{" "}
                     <a href={`https://www.reddit.com/u/${story.author}`}>
