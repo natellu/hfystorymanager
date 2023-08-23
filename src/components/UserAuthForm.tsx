@@ -4,7 +4,6 @@ import { useToast } from "@/hooks/use-toast"
 import { signIn } from "next-auth/react"
 import { useState } from "react"
 import { Button } from "./ui/Button"
-import { useRouter } from "next/navigation"
 
 const UserAuthForm = ({}) => {
     const [isLoading, setIsLoading] = useState(false)

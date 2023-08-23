@@ -22,7 +22,8 @@ export const authOptions: NextAuthOptions = {
         async session({ token, session }) {
             if (token) {
                 session.user.id = token.id
-                session.user.name = token.username
+                session.user.name = token.name
+                session.user.role = token.role
                 session.user.email = token.email
             }
 
@@ -54,7 +55,8 @@ export const authOptions: NextAuthOptions = {
             return {
                 id: dbUser.id,
                 email: dbUser.email,
-                username: dbUser.name
+                role: dbUser.role,
+                name: dbUser.name
             }
         }
     }

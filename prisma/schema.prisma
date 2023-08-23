@@ -45,6 +45,13 @@ model User {
     sessions         Session[]
     subscribedStorys Story[]
     readPosts        String[]
+    role             UserRole  @default(USER)
+}
+
+enum UserRole {
+    ADMIN
+    MOD
+    USER
 }
 
 model Session {
