@@ -3,10 +3,11 @@
 import { CrossIcon } from "lucide-react"
 import { Table } from "@tanstack/react-table"
 
-import { Input } from "./Input"
-import { Button } from "./Button"
-import { sorted } from "@/data/TableData"
+import { sorted } from "@/components/ui/table/data/Data"
 import { DataTableFacetedFilter } from "./DataTableFacetedFilter"
+import { Input } from "../Input"
+import { Button } from "../Button"
+import { DataTableViewOptions } from "./DataTableViewOptions"
 
 interface DataTableToolbarProps<TData> {
     table: Table<TData>
@@ -53,6 +54,7 @@ export function DataTableToolbar<TData>({
                     </Button>
                 )}
             </div>
+            <DataTableViewOptions table={table} />
         </div>
     )
 }

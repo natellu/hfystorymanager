@@ -1,12 +1,10 @@
 "use client"
-import { DataTable } from "@/components/ui/DataTable"
-import { Post } from "@prisma/client"
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
+import { DataTable } from "@/components/ui/table/DataTable"
+
+import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import { columns } from "./columns"
 import { ExtendedPost } from "@/types/db"
-import { Button } from "@/components/ui/Button"
-import { useEffect, useState } from "react"
 
 interface pageProps {}
 

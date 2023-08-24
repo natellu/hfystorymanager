@@ -5,7 +5,7 @@ import { Sorted } from "@prisma/client"
 export const sorted = [
     {
         value: Sorted.GPTSORTED,
-        label: "GPTSorted",
+        label: "GPT",
         icon: Laptop2
     },
     {

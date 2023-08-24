@@ -30,7 +30,7 @@ export default function RootLayout({
                 <Providers>
                     <Navbar />
 
-                    <div className="container max-w-7xl mx-auto h-full pt-12">
+                    <div className="container max-w-8xl mx-auto h-full pt-12">
                         {children}
                     </div>
 

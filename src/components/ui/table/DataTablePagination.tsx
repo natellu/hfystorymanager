@@ -11,8 +11,8 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue
-} from "./Select"
-import { Button } from "./Button"
+} from "../Select"
+import { Button } from "../Button"
 
 interface DataTablePaginationProps<TData> {
     table: Table<TData>
