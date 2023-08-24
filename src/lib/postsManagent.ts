@@ -1,5 +1,5 @@
 import { db } from "@/lib/db"
-import { Post } from "@prisma/client"
+import { Post, Sorted } from "@prisma/client"
 import axios from "axios"
 import { ObjectId } from "bson"
 
@@ -10,6 +10,7 @@ import {
     OpenAIStream,
     OpenAIStreamPayload
 } from "@/lib/openai"
+import { sorted } from "@/data/TableData"
 
 const headers = {
     "User-Agent":
@@ -85,7 +86,8 @@ export async function getPosts(alsoSort: boolean) {
                     archived,
                     selftext,
                     storyId,
-                    chapter: null
+                    chapter: null,
+                    sorted: Sorted.NOTSORTED
                 })
             }
         }
@@ -197,7 +199,8 @@ export async function SortPostToStories() {
                             id: p.id
                         },
                         data: {
-                            chapter: Number(p.chapter)
+                            chapter: Number(p.chapter),
+                            sorted: Sorted.GPTSORTED
                         }
                     })
                 } else {
@@ -222,7 +225,8 @@ export async function SortPostToStories() {
                             id: p.id
                         },
                         data: {
-                            chapter: Number(p.chapter)
+                            chapter: Number(p.chapter),
+                            sorted: Sorted.GPTSORTED
                         }
                     })
                 }

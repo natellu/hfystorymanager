@@ -12,13 +12,16 @@ import {
 import UserAvatar from "./UserAvatar"
 
 import Link from "next/link"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
+import { UserRole } from "@prisma/client"
 
 interface UserAccountNavProps {
     user: Pick<User, "name" | "image" | "email">
 }
 
 const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
+    const { data: session } = useSession()
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
@@ -55,6 +58,28 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
+
+                {session?.user.role === UserRole.ADMIN ||
+                session?.user.role === UserRole.MOD ? (
+                    <>
+                        <DropdownMenuItem asChild>
+                            <Link href="/admin">Admin</Link>
+                        </DropdownMenuItem>
+                        {session?.user.role === UserRole.ADMIN ? (
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin/users">Users</Link>
+                            </DropdownMenuItem>
+                        ) : null}
+                        <DropdownMenuItem asChild>
+                            <Link href="/admin/stories">Stories</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/admin/posts">Posts</Link>
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+                    </>
+                ) : null}
 
                 <DropdownMenuItem
                     onSelect={(e) => {
