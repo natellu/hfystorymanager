@@ -17,6 +17,7 @@ import {
     DropdownMenuTrigger
 } from "../DropdownMenu"
 import { Button } from "../Button"
+import Link from "next/link"
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>
@@ -37,9 +38,11 @@ export function DataTableRowActions<TData>({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem onClick={() => console.log("edit")}>
-                    Edit
-                </DropdownMenuItem>
+                {/*                 <Link href={`/admin/posts/${row.original.id}`}>
+                    <DropdownMenuItem onClick={() => console.log("edit")}>
+                        Edit
+                    </DropdownMenuItem>
+                </Link> */}
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem onClick={() => console.log("delete")}>

@@ -1,12 +1,12 @@
 "use client"
 
-import { CrossIcon } from "lucide-react"
 import { Table } from "@tanstack/react-table"
+import { CrossIcon } from "lucide-react"
 
 import { sorted } from "@/components/ui/table/data/Data"
-import { DataTableFacetedFilter } from "./DataTableFacetedFilter"
-import { Input } from "../Input"
 import { Button } from "../Button"
+import { Input } from "../Input"
+import { DataTableFacetedFilter } from "./DataTableFacetedFilter"
 import { DataTableViewOptions } from "./DataTableViewOptions"
 
 interface DataTableToolbarProps<TData> {
@@ -22,7 +22,7 @@ export function DataTableToolbar<TData>({
         <div className="flex items-center justify-between">
             <div className="flex flex-1 items-center space-x-2">
                 <Input
-                    placeholder="Filter tasks..."
+                    placeholder="Filter posts..."
                     value={
                         (table
                             .getColumn("title")

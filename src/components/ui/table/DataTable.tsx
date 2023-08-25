@@ -2,17 +2,17 @@
 
 import {
     ColumnDef,
+    ColumnFiltersState,
+    SortingState,
+    VisibilityState,
     flexRender,
     getCoreRowModel,
-    useReactTable,
-    getPaginationRowModel,
-    VisibilityState,
-    SortingState,
-    ColumnFiltersState,
-    getFilteredRowModel,
-    getSortedRowModel,
     getFacetedRowModel,
-    getFacetedUniqueValues
+    getFacetedUniqueValues,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable
 } from "@tanstack/react-table"
 
 import {
@@ -23,9 +23,9 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/Table"
+import { useState } from "react"
 import { DataTablePagination } from "./DataTablePagination"
 import { DataTableToolbar } from "./DataTableToolbar"
-import { useState } from "react"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -62,7 +62,8 @@ export function DataTable<TData, TValue>({
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
-        getFacetedUniqueValues: getFacetedUniqueValues()
+        getFacetedUniqueValues: getFacetedUniqueValues(),
+        autoResetPageIndex: false
     })
 
     return (

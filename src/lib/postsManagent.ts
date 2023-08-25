@@ -10,7 +10,6 @@ import {
     OpenAIStream,
     OpenAIStreamPayload
 } from "@/lib/openai"
-import { sorted } from "@/data/TableData"
 
 const headers = {
     "User-Agent":

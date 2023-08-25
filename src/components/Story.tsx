@@ -10,10 +10,7 @@ import {
     CardTitle
 } from "./ui/Card"
 import { ExtendedStory } from "@/types/db"
-import { Button } from "./ui/Button"
-import { CheckCheck } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import axios from "axios"
 import { SubscribeToStoryPayload } from "@/lib/validators/story"
 import SubscribeLeaveToggle from "./SubscribeLeaveToggle"
@@ -25,7 +22,7 @@ interface StoryProps {
 
 const Story: FC<StoryProps> = ({ story, showSubscribe }) => {
     const { data: session } = useSession()
-    const router = useRouter()
+
     const [isSubscribed, setIsSubscribed] = useState(false)
 
     useEffect(() => {
