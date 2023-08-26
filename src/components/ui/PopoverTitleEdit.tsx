@@ -1,6 +1,6 @@
 import { toast } from "@/hooks/use-toast"
 import { UpdatePostPayload } from "@/lib/validators/post"
-import { ExtendedPost } from "@/types/db"
+import { ExtendedPost, ExtendedStory } from "@/types/db"
 import { useMutation } from "@tanstack/react-query"
 import axios from "axios"
 import { FC, useState } from "react"
@@ -11,15 +11,15 @@ import { Label } from "./Label"
 interface PopoverTitleEditProps {
     title: string
     id: string
-    postData: ExtendedPost[]
-    setPostData: (data: ExtendedPost[]) => void
+    data: any[]
+    setData: (data: any[]) => void
 }
 
 const PopoverTitleEdit: FC<PopoverTitleEditProps> = ({
     title,
     id,
-    postData,
-    setPostData
+    data,
+    setData
 }) => {
     const [newTitle, setNewTitle] = useState(title)
 
@@ -34,12 +34,14 @@ const PopoverTitleEdit: FC<PopoverTitleEditProps> = ({
 
             const { data } = await axios.post("/api/posts/update", payload)
 
-            const index = postData.findIndex((p) => p.id === id)
+            const index = data.findIndex(
+                (p: ExtendedPost | ExtendedStory) => p.id === id
+            )
 
-            const postArray: ExtendedPost[] = [...postData]
+            const postArray: ExtendedPost[] = [...data]
             postArray[index] = data
 
-            setPostData(postArray)
+            setData(postArray)
         },
         onError: (err) => {
             toast({

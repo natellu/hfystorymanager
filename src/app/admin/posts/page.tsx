@@ -73,7 +73,7 @@ const page = () => {
                     return (
                         <Popover>
                             <PopoverTrigger asChild>
-                                <div className="flex space-x-2">
+                                <div className="flex space-x-2 cursor-pointer">
                                     <span className="max-w-[500px] truncate font-medium">
                                         {row.getValue("title")}
                                     </span>
@@ -83,8 +83,8 @@ const page = () => {
                                 <PopoverTitleEdit
                                     title={row.original.title}
                                     id={row.original.id}
-                                    postData={postData}
-                                    setPostData={setPostData}
+                                    data={postData}
+                                    setData={setPostData}
                                 />
                             </PopoverContent>
                         </Popover>
@@ -130,8 +130,14 @@ const page = () => {
                     return (
                         <Popover>
                             <PopoverTrigger asChild>
-                                <div className="flex space-x-2">
-                                    <span className="max-w-[300px] truncate font-medium">
+                                <div
+                                    className={
+                                        !row.getValue("Story_title")
+                                            ? "-m-4 p-4 cursor-pointer border-red-400 border-[1px]"
+                                            : "-m-4 p-4 cursor-pointer"
+                                    }
+                                >
+                                    <span className="max-w-[300px] min-w-full truncate font-medium">
                                         {row.getValue("Story_title")}
                                     </span>
                                 </div>
@@ -154,11 +160,19 @@ const page = () => {
                     <DataTableColumnHeader column={column} title="Chapter" />
                 ),
                 cell: ({ row }) => {
+                    console.log(row.getValue("chapter"))
                     return (
                         <Popover>
                             <PopoverTrigger asChild>
-                                <div className="flex space-x-2">
-                                    <span className="max-w-[500px] truncate font-medium">
+                                <div
+                                    className={
+                                        row.getValue("chapter") === undefined ||
+                                        row.getValue("chapter") === null
+                                            ? "-m-4 p-4 cursor-pointer border-red-400 border-[1px]"
+                                            : "-m-4 p-4 cursor-pointer"
+                                    }
+                                >
+                                    <span className=" truncate font-medium max-w-xs">
                                         {row.getValue("chapter")}
                                     </span>
                                 </div>

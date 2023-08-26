@@ -8,3 +8,10 @@ export const UpdatePostValidator = z.object({
 })
 
 export type UpdatePostPayload = z.infer<typeof UpdatePostValidator>
+
+export const UnlinkPostValidator = z.object({
+    id: z.string(),
+    storyId: z.string()
+})
+
+export type UnlinkPostPayload = z.infer<typeof UnlinkPostValidator>
