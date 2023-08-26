@@ -1,6 +1,6 @@
 import { useCustomToast } from "@/hooks/use-custom-toast"
 import { toast } from "@/hooks/use-toast"
-import { SubscribeToStoryPayload } from "@/lib/validators/story"
+import { StoryPayload } from "@/lib/validators/story"
 import { useMutation } from "@tanstack/react-query"
 import axios, { AxiosError } from "axios"
 import { CheckCheck, X } from "lucide-react"
@@ -28,7 +28,7 @@ const SubscribeLeaveToggle: FC<SubscribeLeaveToggleProps> = ({
 
     const { mutate: subscribe, isLoading: isSubscribeLoading } = useMutation({
         mutationFn: async () => {
-            const payload: SubscribeToStoryPayload = {
+            const payload: StoryPayload = {
                 storyId
             }
 
@@ -64,7 +64,7 @@ const SubscribeLeaveToggle: FC<SubscribeLeaveToggleProps> = ({
     const { mutate: unsubscribe, isLoading: isUnSubscribingLoading } =
         useMutation({
             mutationFn: async () => {
-                const payload: SubscribeToStoryPayload = {
+                const payload: StoryPayload = {
                     storyId
                 }
 

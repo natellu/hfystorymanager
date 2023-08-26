@@ -1,6 +1,11 @@
 "use client"
 
+import { StoryPayload } from "@/lib/validators/story"
+import { ExtendedStory } from "@/types/db"
+import axios from "axios"
+import { useSession } from "next-auth/react"
 import { FC, useEffect, useState } from "react"
+import SubscribeLeaveToggle from "./SubscribeLeaveToggle"
 import {
     Card,
     CardContent,
@@ -9,11 +14,6 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/Card"
-import { ExtendedStory } from "@/types/db"
-import { useSession } from "next-auth/react"
-import axios from "axios"
-import { SubscribeToStoryPayload } from "@/lib/validators/story"
-import SubscribeLeaveToggle from "./SubscribeLeaveToggle"
 
 interface StoryProps {
     story: ExtendedStory
@@ -28,7 +28,7 @@ const Story: FC<StoryProps> = ({ story, showSubscribe }) => {
     useEffect(() => {
         if (session && showSubscribe) {
             const fetchData = async () => {
-                const payload: SubscribeToStoryPayload = {
+                const payload: StoryPayload = {
                     storyId: story.id
                 }
 

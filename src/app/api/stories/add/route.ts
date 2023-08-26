@@ -1,11 +1,10 @@
 import { getAuthSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { UnlinkPostValidator } from "@/lib/validators/post"
-import { Sorted, UserRole } from "@prisma/client"
+import { StoryAddValidator } from "@/lib/validators/story"
+import { UserRole } from "@prisma/client"
 import { z } from "zod"
 
 export async function POST(req: Request) {
-    //todo check if middleware handles this
     const session = await getAuthSession()
 
     try {
@@ -17,26 +16,22 @@ export async function POST(req: Request) {
 
         const body = await req.json()
 
-        const { id, storyId } = UnlinkPostValidator.parse(body)
+        const { title, author } = StoryAddValidator.parse(body)
 
-        const updatePost = await db.post.update({
-            where: {
-                id
-            },
+        const addStory = await db.story.create({
             data: {
-                Story: {
-                    disconnect: true
-                },
-                sorted: Sorted.SORTED
+                title,
+                author
             }
         })
 
-        return new Response(JSON.stringify(updatePost))
+        return new Response(JSON.stringify(addStory))
     } catch (error) {
         console.log(error)
+        //todo catch error when title already exist
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })
 
-        return new Response("Could not create subreddit", { status: 500 })
+        return new Response("Could not add story", { status: 500 })
     }
 }

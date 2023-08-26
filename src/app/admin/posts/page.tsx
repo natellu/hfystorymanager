@@ -191,7 +191,12 @@ const page = () => {
             },
             {
                 id: "actions",
-                cell: ({ row }) => <DataTableRowActions row={row} />
+                cell: ({ row }) => (
+                    <DataTableRowActions
+                        data={postData}
+                        setData={setPostData}
+                    />
+                )
             }
         ],
         [postData]

@@ -1,7 +1,7 @@
 import { getAuthSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { UnlinkPostValidator } from "@/lib/validators/post"
-import { Sorted, UserRole } from "@prisma/client"
+import { StoryValidator } from "@/lib/validators/story"
+import { UserRole } from "@prisma/client"
 import { z } from "zod"
 
 export async function POST(req: Request) {
@@ -17,26 +17,21 @@ export async function POST(req: Request) {
 
         const body = await req.json()
 
-        const { id, storyId } = UnlinkPostValidator.parse(body)
+        const { storyId } = StoryValidator.parse(body)
 
-        const updatePost = await db.post.update({
+        const deleteStory = await db.story.delete({
             where: {
-                id
-            },
-            data: {
-                Story: {
-                    disconnect: true
-                },
-                sorted: Sorted.SORTED
+                id: storyId
             }
         })
 
-        return new Response(JSON.stringify(updatePost))
+        console.log(deleteStory)
+        return new Response(JSON.stringify(deleteStory))
     } catch (error) {
         console.log(error)
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })
 
-        return new Response("Could not create subreddit", { status: 500 })
+        return new Response("Could not delete story", { status: 500 })
     }
 }

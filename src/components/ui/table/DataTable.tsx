@@ -23,6 +23,7 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/Table"
+import { TableType } from "@/types/table"
 import { useState } from "react"
 import { DataTablePagination } from "./DataTablePagination"
 import { DataTableToolbar } from "./DataTableToolbar"
@@ -30,11 +31,15 @@ import { DataTableToolbar } from "./DataTableToolbar"
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    tableType?: TableType
+    refetchData?: () => void
 }
 
 export function DataTable<TData, TValue>({
     columns,
-    data
+    data,
+    tableType,
+    refetchData
 }: DataTableProps<TData, TValue>) {
     const [rowSelection, setRowSelection] = useState({})
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
@@ -68,7 +73,11 @@ export function DataTable<TData, TValue>({
 
     return (
         <div className="space-y-4">
-            <DataTableToolbar table={table} />
+            <DataTableToolbar
+                table={table}
+                tableType={tableType}
+                refetchData={refetchData}
+            />
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

@@ -11,6 +11,7 @@ import { DataTable } from "@/components/ui/table/DataTable"
 import { DataTableColumnHeader } from "@/components/ui/table/DataTableColumnHeader"
 import { DataTableRowActions } from "@/components/ui/table/DataTableRowActions"
 import { ExtendedStory } from "@/types/db"
+import { TableType } from "@/types/table"
 import { useQuery } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import axios from "axios"
@@ -19,7 +20,7 @@ import { FC, useMemo, useState } from "react"
 interface pageProps {}
 
 const page: FC<pageProps> = ({}) => {
-    const { data } = useQuery({
+    const { data, refetch } = useQuery({
         queryFn: async () => {
             const query = "/api/stories/all"
             const { data } = await axios.get(query)
@@ -112,7 +113,14 @@ const page: FC<pageProps> = ({}) => {
             },
             {
                 id: "actions",
-                cell: ({ row }) => <DataTableRowActions row={row} />
+                cell: ({ row }) => (
+                    <DataTableRowActions
+                        id={row.original.id}
+                        isStory={true}
+                        data={storiesData}
+                        setData={setStoriesData}
+                    />
+                )
             }
         ],
         [storiesData]
@@ -121,7 +129,12 @@ const page: FC<pageProps> = ({}) => {
     return (
         <div className="container mx-auto py-10 p-4">
             {storiesData ? (
-                <DataTable columns={columns} data={storiesData} />
+                <DataTable
+                    columns={columns}
+                    data={storiesData}
+                    tableType={TableType.STORIES}
+                    refetchData={refetch}
+                />
             ) : null}
         </div>
     )

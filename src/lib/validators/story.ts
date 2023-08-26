@@ -1,7 +1,14 @@
 import { z } from "zod"
 
-export const StorySubscriptionValidator = z.object({
-    storyId: z.string().length(24)
+export const StoryValidator = z.object({
+    storyId: z.string()
 })
 
-export type SubscribeToStoryPayload = z.infer<typeof StorySubscriptionValidator>
+export type StoryPayload = z.infer<typeof StoryValidator>
+
+export const StoryAddValidator = z.object({
+    author: z.string().optional(),
+    title: z.string()
+})
+
+export type StoryAddPayload = z.infer<typeof StoryAddValidator>
