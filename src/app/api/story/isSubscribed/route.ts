@@ -1,6 +1,6 @@
 import { getAuthSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { StorySubscriptionValidator } from "@/lib/validators/story"
+import { StoryValidator } from "@/lib/validators/story"
 
 export async function POST(req: Request) {
     try {
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
         const body = await req.json()
 
-        const { storyId } = StorySubscriptionValidator.parse(body)
+        const { storyId } = StoryValidator.parse(body)
 
         const subscriptionExists = await db.user.findFirst({
             where: {

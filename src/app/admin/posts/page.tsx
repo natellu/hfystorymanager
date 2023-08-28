@@ -12,6 +12,7 @@ import axios from "axios"
 import PopoverChapterEdit from "@/components/ui/popovers/PopoverChapterEdit"
 import PopoverTitleEdit from "@/components/ui/popovers/PopoverTitleEdit"
 import { ExtendedPost } from "@/types/db"
+import { TableType } from "@/types/table"
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
 
@@ -158,7 +159,14 @@ const page = () => {
 
     return (
         <div className="container mx-auto py-10">
-            {postData ? <DataTable columns={columns} data={postData} /> : null}
+            {postData ? (
+                <DataTable
+                    columns={columns}
+                    data={postData}
+                    tableType={TableType.POSTS}
+                    refetchData={refetch}
+                />
+            ) : null}
         </div>
     )
 }

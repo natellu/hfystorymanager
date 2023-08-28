@@ -233,3 +233,161 @@ export async function SortPostToStories() {
         }
     } while (posts.length > 0)
 }
+
+export async function ImportMultiplePosts(link: string) {
+    const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
+
+    let jsonLink = ""
+    if (link.endsWith("/")) jsonLink = link.slice(0, -1) + ".json?limit=100"
+    else jsonLink = link + ".json?limit=100"
+
+    const {
+        data: {
+            data: { children: data }
+        }
+    } = await axios.get(jsonLink, {
+        headers
+    })
+
+    let d = data
+
+    while (Object.keys(d).length > 0) {
+        let posts: Post[] = []
+
+        for (const key in Object.keys(d)) {
+            let {
+                id: postId,
+                title,
+                subreddit,
+                author,
+                name,
+                permalink,
+                created,
+                score,
+                archived,
+                selftext,
+                storyId
+            }: Post = { ...d[key].data }
+
+            if (subreddit !== "HFY") {
+                const postExist = await db.post.findFirst({
+                    where: {
+                        postId: postId
+                    }
+                })
+
+                if (postExist) {
+                    console.log(`Post Exists ${title}`)
+                } else {
+                    posts.push({
+                        id: new ObjectId().toString(),
+                        postId,
+                        title,
+                        subreddit,
+                        author,
+                        name,
+                        permalink,
+                        created,
+                        score,
+                        archived,
+                        selftext,
+                        storyId,
+                        chapter: null,
+                        sorted: Sorted.NOTSORTED
+                    })
+                }
+            }
+        }
+
+        if (posts.length > 0)
+            await db.post.createMany({
+                data: posts
+            })
+
+        jsonLink = ""
+        if (link.endsWith("/"))
+            jsonLink =
+                link.slice(0, -1) + `.json?&after=${d[d.length - 1].data.name}`
+        else jsonLink = link + `.json?&after=${d[d.length - 1].data.name}`
+
+        const {
+            data: {
+                data: { children: data }
+            },
+            headers: resHeader
+        } = await axios.get(jsonLink, { headers })
+
+        await delay(2300)
+
+        if (resHeader["x-ratelimit-remaining"] < 5) {
+            console.log(`Waiting for ${resHeader["x-ratelimit-reset"]} seconds`)
+            await delay(resHeader["x-ratelimit-reset"] * 1000)
+        }
+        d = data
+    }
+
+    return
+}
+
+export async function ImportSinglePost(link: string) {
+    let jsonLink = ""
+    if (link.endsWith("/")) jsonLink = link.slice(0, -1) + ".json"
+    else jsonLink = link + ".json"
+
+    const { data } = await axios.get(jsonLink, {
+        headers
+    })
+
+    const {
+        data: { children: tempData }
+    } = data[0]
+
+    const { data: redditPost } = tempData[0]
+
+    let {
+        id: postId,
+        title,
+        subreddit,
+        author,
+        name,
+        permalink,
+        created,
+        score,
+        archived,
+        selftext,
+        storyId
+    }: Post = { ...redditPost }
+
+    if (subreddit !== "HFY") throw new Error()
+
+    const postExist = await db.post.findFirst({
+        where: {
+            postId: postId
+        }
+    })
+
+    if (postExist) {
+        console.log("post exists")
+        throw new Error()
+    }
+
+    const importedPost = await db.post.create({
+        data: {
+            postId,
+            title,
+            subreddit,
+            author,
+            name,
+            permalink,
+            created,
+            score,
+            archived,
+            selftext,
+            storyId,
+            sorted: Sorted.NOTSORTED,
+            chapter: null
+        }
+    })
+
+    return importedPost
+}

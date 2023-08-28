@@ -3,6 +3,7 @@
 import { Table } from "@tanstack/react-table"
 import { CrossIcon } from "lucide-react"
 
+import CreatePost from "@/components/CreatePost"
 import CreateStory from "@/components/CreateStory"
 import { sorted } from "@/components/ui/table/data/Data"
 import { TableType } from "@/types/table"
@@ -60,9 +61,16 @@ export function DataTableToolbar<TData>({
                     </Button>
                 )}
             </div>
+            {/* Todo: ??????? own component? */}
             {tableType === TableType.STORIES ? (
                 <CreateStory refetchData={refetchData} />
-            ) : null}
+            ) : (
+                <>
+                    {tableType === TableType.POSTS ? (
+                        <CreatePost refetchData={refetchData} />
+                    ) : null}
+                </>
+            )}
             <DataTableViewOptions table={table} />
         </div>
     )
