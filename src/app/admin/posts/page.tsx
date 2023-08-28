@@ -2,20 +2,15 @@
 import { DataTable } from "@/components/ui/table/DataTable"
 
 import { Checkbox } from "@/components/ui/Checkbox"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger
-} from "@/components/ui/Popover"
-import PopoverStoryEdit from "@/components/ui/PopoverStoryEdit"
+import PopoverStoryEdit from "@/components/ui/popovers/PopoverStoryEdit"
 import { DataTableColumnHeader } from "@/components/ui/table/DataTableColumnHeader"
 import { DataTableRowActions } from "@/components/ui/table/DataTableRowActions"
 import { sorted } from "@/components/ui/table/data/Data"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 
-import PopoverChapterEdit from "@/components/ui/PopoverChapterEdit"
-import PopoverTitleEdit from "@/components/ui/PopoverTitleEdit"
+import PopoverChapterEdit from "@/components/ui/popovers/PopoverChapterEdit"
+import PopoverTitleEdit from "@/components/ui/popovers/PopoverTitleEdit"
 import { ExtendedPost } from "@/types/db"
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
@@ -71,23 +66,13 @@ const page = () => {
                 ),
                 cell: ({ row }) => {
                     return (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <div className="flex space-x-2 cursor-pointer">
-                                    <span className="max-w-[500px] truncate font-medium">
-                                        {row.getValue("title")}
-                                    </span>
-                                </div>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[500px]">
-                                <PopoverTitleEdit
-                                    title={row.original.title}
-                                    id={row.original.id}
-                                    data={postData}
-                                    setData={setPostData}
-                                />
-                            </PopoverContent>
-                        </Popover>
+                        <PopoverTitleEdit
+                            row={row}
+                            title={row.original.title}
+                            id={row.original.id}
+                            data={postData}
+                            setData={setPostData}
+                        />
                     )
                 }
             },
@@ -128,29 +113,13 @@ const page = () => {
                 },
                 cell: ({ row }) => {
                     return (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <div
-                                    className={
-                                        !row.getValue("Story_title")
-                                            ? "-m-4 p-4 cursor-pointer border-red-400 border-[1px]"
-                                            : "-m-4 p-4 cursor-pointer"
-                                    }
-                                >
-                                    <span className="max-w-[300px] min-w-full truncate font-medium">
-                                        {row.getValue("Story_title")}
-                                    </span>
-                                </div>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[500px]">
-                                <PopoverStoryEdit
-                                    storyId={row.original.storyId}
-                                    id={row.original.id}
-                                    postData={postData}
-                                    setPostData={setPostData}
-                                />
-                            </PopoverContent>
-                        </Popover>
+                        <PopoverStoryEdit
+                            row={row}
+                            storyId={row.original.storyId}
+                            id={row.original.id}
+                            postData={postData}
+                            setPostData={setPostData}
+                        />
                     )
                 }
             },
@@ -162,30 +131,13 @@ const page = () => {
                 cell: ({ row }) => {
                     console.log(row.getValue("chapter"))
                     return (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <div
-                                    className={
-                                        row.getValue("chapter") === undefined ||
-                                        row.getValue("chapter") === null
-                                            ? "-m-4 p-4 cursor-pointer border-red-400 border-[1px]"
-                                            : "-m-4 p-4 cursor-pointer"
-                                    }
-                                >
-                                    <span className=" truncate font-medium max-w-xs">
-                                        {row.getValue("chapter")}
-                                    </span>
-                                </div>
-                            </PopoverTrigger>
-                            <PopoverContent className=" w-64 ">
-                                <PopoverChapterEdit
-                                    chapter={row.original.chapter}
-                                    id={row.original.id}
-                                    postData={postData}
-                                    setPostData={setPostData}
-                                />
-                            </PopoverContent>
-                        </Popover>
+                        <PopoverChapterEdit
+                            row={row}
+                            chapter={row.original.chapter}
+                            id={row.original.id}
+                            postData={postData}
+                            setPostData={setPostData}
+                        />
                     )
                 }
             },

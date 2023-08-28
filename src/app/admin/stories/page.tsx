@@ -1,12 +1,7 @@
 "use client"
 import { Checkbox } from "@/components/ui/Checkbox"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger
-} from "@/components/ui/Popover"
-import PopoverChaptersEdit from "@/components/ui/PopoverChaptersEdit"
-import PopoverTitleEdit from "@/components/ui/PopoverTitleEdit"
+import PopoverChaptersEdit from "@/components/ui/popovers/PopoverChaptersEdit"
+import PopoverTitleEdit from "@/components/ui/popovers/PopoverTitleEdit"
 import { DataTable } from "@/components/ui/table/DataTable"
 import { DataTableColumnHeader } from "@/components/ui/table/DataTableColumnHeader"
 import { DataTableRowActions } from "@/components/ui/table/DataTableRowActions"
@@ -64,23 +59,13 @@ const page: FC<pageProps> = ({}) => {
                 ),
                 cell: ({ row }) => {
                     return (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <div className="flex space-x-2">
-                                    <span className="max-w-[500px] truncate font-medium">
-                                        {row.getValue("title")}
-                                    </span>
-                                </div>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[500px]">
-                                <PopoverTitleEdit
-                                    title={row.original.title}
-                                    id={row.original.id}
-                                    data={storiesData}
-                                    setData={setStoriesData}
-                                />
-                            </PopoverContent>
-                        </Popover>
+                        <PopoverTitleEdit
+                            row={row}
+                            title={row.original.title}
+                            id={row.original.id}
+                            data={storiesData}
+                            setData={setStoriesData}
+                        />
                     )
                 }
             },
@@ -91,23 +76,13 @@ const page: FC<pageProps> = ({}) => {
                 ),
                 cell: ({ row }) => {
                     return (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <div className="flex space-x-2 p-4">
-                                    <span className="max-w-[500px] truncate font-medium">
-                                        {row.original.chapters.length}
-                                    </span>
-                                </div>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[500px]">
-                                <PopoverChaptersEdit
-                                    chapters={row.original.chapters}
-                                    id={row.original.id}
-                                    data={storiesData}
-                                    setData={setStoriesData}
-                                />
-                            </PopoverContent>
-                        </Popover>
+                        <PopoverChaptersEdit
+                            row={row}
+                            chapters={row.original.chapters}
+                            id={row.original.id}
+                            data={storiesData}
+                            setData={setStoriesData}
+                        />
                     )
                 }
             },
