@@ -1,4 +1,5 @@
 Todo:
+subscribing to story fix
 table popover edit -> dialog? one popover?
 table filter -> title, story
 couple post author with story author?
