@@ -130,7 +130,6 @@ const page = () => {
                     <DataTableColumnHeader column={column} title="Chapter" />
                 ),
                 cell: ({ row }) => {
-                    console.log(row.getValue("chapter"))
                     return (
                         <PopoverChapterEdit
                             row={row}
@@ -148,6 +147,8 @@ const page = () => {
                     <DataTableRowActions
                         data={postData}
                         setData={setPostData}
+                        id={row.original.id}
+                        tableType={TableType.POSTS}
                     />
                 )
             }

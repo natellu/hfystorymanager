@@ -91,7 +91,7 @@ const page: FC<pageProps> = ({}) => {
                 cell: ({ row }) => (
                     <DataTableRowActions
                         id={row.original.id}
-                        isStory={true}
+                        tableType={TableType.STORIES}
                         data={storiesData}
                         setData={setStoriesData}
                     />

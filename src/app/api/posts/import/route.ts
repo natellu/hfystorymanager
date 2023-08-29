@@ -24,6 +24,7 @@ export async function POST(req: Request) {
         //check if link is user or post
 
         if (link.startsWith("https://www.reddit.com/user/")) {
+            console.log(link)
             await ImportMultiplePosts(link)
         } else {
             const importedPost = await ImportSinglePost(link)

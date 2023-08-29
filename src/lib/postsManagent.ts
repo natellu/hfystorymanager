@@ -270,32 +270,38 @@ export async function ImportMultiplePosts(link: string) {
             }: Post = { ...d[key].data }
 
             if (subreddit !== "HFY") {
-                const postExist = await db.post.findFirst({
-                    where: {
-                        postId: postId
-                    }
-                })
+                continue
+            }
 
-                if (postExist) {
-                    console.log(`Post Exists ${title}`)
-                } else {
-                    posts.push({
-                        id: new ObjectId().toString(),
-                        postId,
-                        title,
-                        subreddit,
-                        author,
-                        name,
-                        permalink,
-                        created,
-                        score,
-                        archived,
-                        selftext,
-                        storyId,
-                        chapter: null,
-                        sorted: Sorted.NOTSORTED
-                    })
+            if (d[key].kind !== "t3") {
+                continue
+            }
+
+            const postExist = await db.post.findFirst({
+                where: {
+                    postId: postId
                 }
+            })
+
+            if (postExist) {
+                console.log(`Post Exists ${title}`)
+            } else {
+                posts.push({
+                    id: new ObjectId().toString(),
+                    postId,
+                    title,
+                    subreddit,
+                    author,
+                    name,
+                    permalink,
+                    created,
+                    score,
+                    archived,
+                    selftext,
+                    storyId,
+                    chapter: null,
+                    sorted: Sorted.NOTSORTED
+                })
             }
         }
 

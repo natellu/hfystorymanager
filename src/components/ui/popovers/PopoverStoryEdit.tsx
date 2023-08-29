@@ -50,6 +50,8 @@ const PopoverStoryEdit: FC<PopoverStoryEditProps> = ({
 
     useEffect(() => {
         setStories(data)
+        if (row.original.Story)
+            setValue(row.original.Story?.title.toLowerCase())
     }, [data])
 
     const [open, setOpen] = useState(false)
@@ -136,7 +138,13 @@ const PopoverStoryEdit: FC<PopoverStoryEditProps> = ({
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[200px] p-0">
                                         <ScrollArea className="h-72 w-48 rounded-md border">
-                                            <Command>
+                                            <Command
+                                                filter={(value, search) => {
+                                                    if (value.includes(search))
+                                                        return 1
+                                                    return 0
+                                                }}
+                                            >
                                                 <CommandInput placeholder="Search stories..." />
                                                 <CommandEmpty>
                                                     No story found.
@@ -144,6 +152,7 @@ const PopoverStoryEdit: FC<PopoverStoryEditProps> = ({
                                                 <CommandGroup>
                                                     {stories.map((story) => (
                                                         <CommandItem
+                                                            value={story.title}
                                                             key={story.id}
                                                             onSelect={(
                                                                 currentValue
@@ -159,12 +168,13 @@ const PopoverStoryEdit: FC<PopoverStoryEditProps> = ({
                                                                 )
                                                                 setOpen(false)
                                                             }}
+                                                            className="grid grid-cols-[1rem_1fr] gap-2"
                                                         >
                                                             <CheckIcon
                                                                 className={cn(
-                                                                    "mr-2 h-4 w-4",
-                                                                    value ===
-                                                                        story.id
+                                                                    "h-4 w-4",
+                                                                    story.title.toLowerCase() ===
+                                                                        value.toLowerCase()
                                                                         ? "opacity-100"
                                                                         : "opacity-0"
                                                                 )}

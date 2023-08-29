@@ -1,6 +1,6 @@
 import { getAuthSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { StoryValidator } from "@/lib/validators/story"
+import { PostValidator } from "@/lib/validators/post"
 import { UserRole } from "@prisma/client"
 import { z } from "zod"
 
@@ -16,12 +16,13 @@ export async function POST(req: Request) {
             return new Response("Unauthorized", { status: 401 })
 
         const body = await req.json()
+        const { id } = PostValidator.parse(body)
 
-        const { storyId } = StoryValidator.parse(body)
+        console.log(id)
 
-        const deleteStory = await db.story.delete({
+        const deleteStory = await db.post.delete({
             where: {
-                id: storyId
+                id
             }
         })
 
@@ -31,6 +32,6 @@ export async function POST(req: Request) {
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })
 
-        return new Response("Could not delete story", { status: 500 })
+        return new Response("Could not delete post", { status: 500 })
     }
 }

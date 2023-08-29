@@ -15,3 +15,9 @@ export const UnlinkPostValidator = z.object({
 })
 
 export type UnlinkPostPayload = z.infer<typeof UnlinkPostValidator>
+
+export const PostValidator = z.object({
+    id: z.string()
+})
+
+export type PostPayload = z.infer<typeof PostValidator>
