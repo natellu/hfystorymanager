@@ -28,7 +28,11 @@ export async function GET(req: Request) {
                         take: parseInt(limit),
                         skip: (parseInt(page) - 1) * parseInt(limit),
                         include: {
-                            chapters: true
+                            chapters: {
+                                orderBy: {
+                                    created: "desc"
+                                }
+                            }
                         }
                     }
                 }
@@ -46,9 +50,8 @@ export async function GET(req: Request) {
             },
             include: {
                 chapters: {
-                    take: 3,
                     orderBy: {
-                        created: "asc"
+                        created: "desc"
                     }
                 }
             }

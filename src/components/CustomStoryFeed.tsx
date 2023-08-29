@@ -14,7 +14,11 @@ const CustomStoryFeed = async () => {
         include: {
             subscribedStorys: {
                 include: {
-                    chapters: true
+                    chapters: {
+                        orderBy: {
+                            created: "desc"
+                        }
+                    }
                 }
             }
         }

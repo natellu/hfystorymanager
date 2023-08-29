@@ -1,6 +1,8 @@
 Todo:
+table popover edit -> dialog? one popover?
 table filter -> title, story
 couple post author with story author?
+mark chapters as read -> mark story as read?
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 

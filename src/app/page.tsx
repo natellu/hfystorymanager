@@ -1,5 +1,4 @@
 import GeneralStoryFeed from "@/components/GeneralStoryFeed"
-import SubscribedStoryFeed from "@/components/CustomStoryFeed"
 
 import { getAuthSession } from "@/lib/auth"
 import Link from "next/link"
