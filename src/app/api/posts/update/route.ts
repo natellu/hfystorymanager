@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
         const { id, storyId, chapter, title } = UpdatePostValidator.parse(body)
 
-        const updatePost = await db.post.update({
+        const updatedPost = await db.post.update({
             where: {
                 id
             },
@@ -48,7 +48,9 @@ export async function POST(req: Request) {
             }
         })
 
-        return new Response(JSON.stringify(updatePost))
+        console.log(updatedPost)
+
+        return new Response(JSON.stringify(updatedPost))
     } catch (error) {
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })

@@ -36,18 +36,22 @@ const PopoverTitleEdit: FC<PopoverTitleEditProps> = ({
                 title: newTitle
             }
 
-            const { data } = await axios.post("/api/posts/update", payload)
+            const { data: updatedPost } = await axios.post(
+                "/api/posts/update",
+                payload
+            )
 
             const index = data.findIndex(
                 (p: ExtendedPost | ExtendedStory) => p.id === id
             )
 
             const postArray: ExtendedPost[] = [...data]
-            postArray[index] = data
+            postArray[index] = updatedPost
 
             setData(postArray)
         },
         onError: (err) => {
+            console.log(err)
             toast({
                 title: "There was an error.",
                 description: "Could not create post. Please try again.",
