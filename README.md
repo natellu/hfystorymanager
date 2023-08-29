@@ -1,5 +1,6 @@
 Todo:
 table filter -> title, story
+couple post author with story author?
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
