@@ -27,7 +27,6 @@ export async function POST(req: Request) {
 
         return new Response(JSON.stringify(addStory))
     } catch (error) {
-        console.log(error)
         //todo catch error when title already exist
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })

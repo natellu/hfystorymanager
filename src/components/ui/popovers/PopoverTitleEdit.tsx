@@ -51,7 +51,6 @@ const PopoverTitleEdit: FC<PopoverTitleEditProps> = ({
             setData(postArray)
         },
         onError: (err) => {
-            console.log(err)
             toast({
                 title: "There was an error.",
                 description: "Could not create post. Please try again.",

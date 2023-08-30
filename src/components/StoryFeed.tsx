@@ -29,7 +29,6 @@ const StoryFeed: FC<StoryFeedProps> = ({
 
             const { data } = await axios.get(query)
 
-            console.log(data)
             return data as ExtendedStory[]
         },
         {

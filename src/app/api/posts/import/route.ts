@@ -24,7 +24,6 @@ export async function POST(req: Request) {
         //check if link is user or post
 
         if (link.startsWith("https://www.reddit.com/user/")) {
-            console.log(link)
             await ImportMultiplePosts(link)
         } else {
             const importedPost = await ImportSinglePost(link)
@@ -32,7 +31,6 @@ export async function POST(req: Request) {
 
         return new Response("Ok")
     } catch (error) {
-        console.log(error)
         return new Response("Could not import", { status: 500 })
     }
 }

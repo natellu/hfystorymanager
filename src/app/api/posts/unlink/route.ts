@@ -33,10 +33,9 @@ export async function POST(req: Request) {
 
         return new Response(JSON.stringify(updatePost))
     } catch (error) {
-        console.log(error)
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })
 
-        return new Response("Could not create subreddit", { status: 500 })
+        return new Response("Could not unlink", { status: 500 })
     }
 }

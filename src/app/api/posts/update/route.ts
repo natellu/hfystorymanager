@@ -48,8 +48,6 @@ export async function POST(req: Request) {
             }
         })
 
-        console.log(updatedPost)
-
         return new Response(JSON.stringify(updatedPost))
     } catch (error) {
         if (error instanceof z.ZodError)

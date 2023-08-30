@@ -12,7 +12,7 @@ const CustomStoryFeed = async () => {
             id: session?.user.id
         },
         include: {
-            subscribedStorys: {
+            subscribedStories: {
                 include: {
                     chapters: {
                         orderBy: {
@@ -25,7 +25,7 @@ const CustomStoryFeed = async () => {
     })
 
     return (
-        <StoryFeed initialStorys={user?.subscribedStorys!} subscribed={true} />
+        <StoryFeed initialStorys={user?.subscribedStories!} subscribed={true} />
     )
 }
 

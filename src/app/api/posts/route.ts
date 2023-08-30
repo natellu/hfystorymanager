@@ -36,7 +36,6 @@ export async function GET(req: Request) {
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })
 
-        console.log(error)
         return new Response("Something went wrong with fetching stories", {
             status: 500
         })

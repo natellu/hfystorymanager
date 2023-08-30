@@ -46,7 +46,5 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
         data.choices[0].message.content
     )
 
-    console.log(data)
-
     return gptRes
 }

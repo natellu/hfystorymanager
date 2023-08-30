@@ -18,8 +18,6 @@ export async function POST(req: Request) {
         const body = await req.json()
         const { id } = PostValidator.parse(body)
 
-        console.log(id)
-
         const deleteStory = await db.post.delete({
             where: {
                 id
@@ -28,7 +26,6 @@ export async function POST(req: Request) {
 
         return new Response(JSON.stringify(deleteStory))
     } catch (error) {
-        console.log(error)
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })
 
