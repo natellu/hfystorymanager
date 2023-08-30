@@ -32,7 +32,7 @@ const SubscribeLeaveToggle: FC<SubscribeLeaveToggleProps> = ({
                 storyId
             }
 
-            const { data } = await axios.post("/api/story/subscribe", payload)
+            const { data } = await axios.post("/api/stories/subscribe", payload)
 
             return data as string
         },
@@ -69,7 +69,7 @@ const SubscribeLeaveToggle: FC<SubscribeLeaveToggleProps> = ({
                 }
 
                 const { data } = await axios.post(
-                    "/api/story/subscribe",
+                    "/api/stories/subscribe",
                     payload
                 )
 

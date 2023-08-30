@@ -18,7 +18,7 @@ export async function POST(req: Request) {
                 id: session.user.id
             },
             include: {
-                subscribedStorys: {
+                subscribedStories: {
                     where: {
                         id: storyId
                     }
@@ -26,14 +26,14 @@ export async function POST(req: Request) {
             }
         })
 
-        if (subscriptionExists?.subscribedStorys.length! > 0) {
+        if (subscriptionExists?.subscribedStories.length! > 0) {
             await db.user.update({
                 where: {
                     id: session.user.id
                 },
                 data: {
-                    subscribedStorys: {
-                        disconnect: { id: storyId }
+                    subscribedStories: {
+                        disconnect: [{ id: storyId }]
                     }
                 }
             })
@@ -46,8 +46,8 @@ export async function POST(req: Request) {
                 id: session.user.id
             },
             data: {
-                subscribedStorys: {
-                    connect: { id: storyId }
+                subscribedStories: {
+                    connect: [{ id: storyId }]
                 }
             }
         })

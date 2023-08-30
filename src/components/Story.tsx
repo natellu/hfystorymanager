@@ -33,7 +33,7 @@ const Story: FC<StoryProps> = ({ story, showSubscribe }) => {
                 }
 
                 const { data } = await axios.post(
-                    "/api/story/isSubscribed",
+                    "/api/stories/isSubscribed",
                     payload
                 )
 

@@ -32,27 +32,28 @@ enum Sorted {
 }
 
 model Story {
-    id       String  @id @default(auto()) @map("_id") @db.ObjectId
+    id       String   @id @default(auto()) @map("_id") @db.ObjectId
     author   String?
-    title    String  @unique
+    title    String   @unique
     chapters Post[]
-    User     User?   @relation(fields: [userId], references: [id])
-    userId   String? @db.ObjectId
+    users    User[]   @relation(fields: [userIds], references: [id])
+    userIds  String[] @db.ObjectId
 }
 
 model User {
-    id               String    @id @default(auto()) @map("_id") @db.ObjectId
-    email            String?
-    emailVerified    DateTime?
-    name             String    @unique
-    image            String?
-    createdAt        DateTime  @default(now())
-    updatedAt        DateTime  @updatedAt
-    accounts         Account[]
-    sessions         Session[]
-    subscribedStorys Story[]
-    readPosts        String[]
-    role             UserRole  @default(USER)
+    id                   String    @id @default(auto()) @map("_id") @db.ObjectId
+    email                String?
+    emailVerified        DateTime?
+    name                 String    @unique
+    image                String?
+    createdAt            DateTime  @default(now())
+    updatedAt            DateTime  @updatedAt
+    accounts             Account[]
+    sessions             Session[]
+    subscribedStories    Story[]   @relation(fields: [subscribedStoriesIds], references: [id])
+    subscribedStoriesIds String[]  @db.ObjectId
+    readPosts            String[]
+    role                 UserRole  @default(USER)
 }
 
 enum UserRole {

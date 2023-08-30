@@ -17,7 +17,7 @@ export async function POST(req: Request) {
                 id: session.user.id
             },
             include: {
-                subscribedStorys: {
+                subscribedStories: {
                     where: {
                         id: storyId
                     }
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
             }
         })
 
-        if (subscriptionExists?.subscribedStorys.length! > 0)
+        if (subscriptionExists?.subscribedStories.length! > 0)
             return new Response(storyId)
 
         return new Response(null)
