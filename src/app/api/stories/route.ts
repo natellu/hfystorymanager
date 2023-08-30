@@ -24,7 +24,7 @@ export async function GET(req: Request) {
                     id: session?.user.id
                 },
                 include: {
-                    subscribedStorys: {
+                    subscribedStories: {
                         take: parseInt(limit),
                         skip: (parseInt(page) - 1) * parseInt(limit),
                         include: {
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
             })
             if (!user) throw new Error()
 
-            return new Response(JSON.stringify(user?.subscribedStorys))
+            return new Response(JSON.stringify(user?.subscribedStories))
         }
 
         const stories = await db.story.findMany({
