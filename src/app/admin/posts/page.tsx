@@ -21,7 +21,7 @@ interface pageProps {}
 //todo incremental loading
 //todo delete
 
-const page = () => {
+const Page = () => {
     const { data, refetch, isFetched, isFetching } = useQuery({
         queryFn: async () => {
             const query = `/api/posts`
@@ -172,4 +172,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page

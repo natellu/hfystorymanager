@@ -10,11 +10,11 @@ import { TableType } from "@/types/table"
 import { useQuery } from "@tanstack/react-query"
 import { ColumnDef } from "@tanstack/react-table"
 import axios from "axios"
-import { FC, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 
 interface pageProps {}
 
-const page: FC<pageProps> = ({}) => {
+const Page = ({}) => {
     const { data, refetch } = useQuery({
         queryFn: async () => {
             const query = "/api/stories/all"
@@ -115,4 +115,4 @@ const page: FC<pageProps> = ({}) => {
     )
 }
 
-export default page
+export default Page
