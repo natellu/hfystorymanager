@@ -1,8 +1,7 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { NextAuthOptions, getServerSession } from "next-auth"
-import { db } from "./db"
 import RedditProvider from "next-auth/providers/reddit"
-import { nanoid } from "nanoid"
+import { db } from "./db"
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(db),
@@ -17,6 +16,26 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.REDDIT_CLIENT_ID,
             clientSecret: process.env.REDDIT_CLIENT_SECRET
         })
+        /*         {
+            id: "reddit",
+            name: "Reddit",
+            type: "oauth",
+            authorization:
+                "https://www.reddit.com/api/v1/authorize?scope=identity",
+            token: " https://www.reddit.com/api/v1/access_token",
+            userinfo: "https://oauth.reddit.com/api/v1/me",
+            profile(profile) {
+                console.log(profile.id)
+                return {
+                    id: profile.id,
+                    name: profile.name,
+                    email: null,
+                    image: null
+                }
+            },
+            clientId: process.env.REDDIT_CLIENT_ID,
+            clientSecret: process.env.REDDIT_CLIENT_SECRET
+        } */
     ],
     callbacks: {
         async session({ token, session }) {
@@ -31,7 +50,7 @@ export const authOptions: NextAuthOptions = {
         },
         async jwt({ token, user }) {
             const dbUser = await db.user.findFirst({
-                where: { id: token.id }
+                where: { id: token.sub }
             })
 
             if (!dbUser) {
@@ -40,19 +59,8 @@ export const authOptions: NextAuthOptions = {
                 return token
             }
 
-            if (!dbUser.name) {
-                console.log("generating username")
-                await db.user.update({
-                    where: {
-                        id: dbUser.id
-                    },
-                    data: {
-                        name: nanoid(10)
-                    }
-                })
-            }
-
             return {
+                sub: dbUser.id,
                 id: dbUser.id,
                 email: dbUser.email,
                 role: dbUser.role,
