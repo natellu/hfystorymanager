@@ -2,18 +2,18 @@
 
 import { User } from "next-auth"
 import { FC } from "react"
+import UserAvatar from "./UserAvatar"
 import {
     DropdownMenu,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
     DropdownMenuContent,
-    DropdownMenuSeparator
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
 } from "./ui/DropdownMenu"
-import UserAvatar from "./UserAvatar"
 
-import Link from "next/link"
-import { signOut, useSession } from "next-auth/react"
 import { UserRole } from "@prisma/client"
+import { signOut, useSession } from "next-auth/react"
+import Link from "next/link"
 
 interface UserAccountNavProps {
     user: Pick<User, "name" | "image" | "email">
@@ -24,7 +24,8 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger className="flex items-center">
+                <span>{user.name}</span>
                 <UserAvatar
                     className="h-8 w-8"
                     user={{
