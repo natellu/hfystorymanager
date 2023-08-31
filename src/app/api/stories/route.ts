@@ -1,5 +1,6 @@
 import { getAuthSession } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { ExtendedStory } from "@/types/db"
 import { z } from "zod"
 
 export async function GET(req: Request) {
@@ -31,6 +32,15 @@ export async function GET(req: Request) {
                             chapters: {
                                 orderBy: {
                                     created: "desc"
+                                },
+                                include: {
+                                    Users: session
+                                        ? {
+                                              where: {
+                                                  id: session.user.id
+                                              }
+                                          }
+                                        : false
                                 }
                             }
                         }
@@ -52,12 +62,25 @@ export async function GET(req: Request) {
                 chapters: {
                     orderBy: {
                         created: "desc"
+                    },
+                    include: {
+                        Users: session
+                            ? {
+                                  where: {
+                                      id: session.user.id
+                                  }
+                              }
+                            : false
                     }
                 }
             }
         })
 
-        return new Response(JSON.stringify(stories))
+        const tempStorys: ExtendedStory[] = stories
+
+        tempStorys?.map((story) => story.chapters.map((c) => delete c.userIds))
+
+        return new Response(JSON.stringify(tempStorys))
     } catch (error) {
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })

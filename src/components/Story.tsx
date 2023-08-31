@@ -119,18 +119,27 @@ const Story: FC<StoryProps> = ({ story, showSubscribe }) => {
                 <div className="grid gap-2">
                     {storyData.chapters?.map((post) => (
                         <div key={post.postId}>
-                            <Checkbox
-                                className="mr-2"
-                                onCheckedChange={(checked: boolean) =>
-                                    togglePostRead({
-                                        postId: post.id,
-                                        read: checked
-                                    })
-                                }
-                                //@ts-ignore todo????
-                                checked={post.Users?.length > 0}
-                            />
-                            <a href={`https://reddit.com${post.permalink}`}>
+                            {
+                                //@ts-ignore
+                                post.Users ? (
+                                    <Checkbox
+                                        className="mr-2"
+                                        onCheckedChange={(checked: boolean) =>
+                                            togglePostRead({
+                                                postId: post.id,
+                                                read: checked
+                                            })
+                                        }
+                                        //@ts-ignore todo????
+                                        checked={post.Users?.length > 0}
+                                    />
+                                ) : null
+                            }
+                            <a
+                                href={`https://reddit.com${post.permalink}`}
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
                                 {post.title}
                             </a>
                         </div>
