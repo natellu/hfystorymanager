@@ -86,7 +86,8 @@ export async function getPosts(alsoSort: boolean) {
                     selftext,
                     storyId,
                     chapter: null,
-                    sorted: Sorted.NOTSORTED
+                    sorted: Sorted.NOTSORTED,
+                    userIds: []
                 })
             }
         }
@@ -300,7 +301,8 @@ export async function ImportMultiplePosts(link: string) {
                     selftext,
                     storyId,
                     chapter: null,
-                    sorted: Sorted.NOTSORTED
+                    sorted: Sorted.NOTSORTED,
+                    userIds: []
                 })
             }
         }
