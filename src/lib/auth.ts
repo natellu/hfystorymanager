@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
             profile(profile) {
                 console.log(profile.id)
                 return {
-                    id: profile.id,
+                    id: profile.id, 
                     name: profile.name,
                     email: null,
                     image: null
