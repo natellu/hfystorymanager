@@ -77,7 +77,7 @@ const Story: FC<StoryProps> = ({ story, showSubscribe }) => {
 
             toast({
                 title: "There was an problem.",
-                description: "Something went wrong, please try again.",
+                description: "Something went wrong, please try again!",
                 variant: "destructive"
             })
         },
