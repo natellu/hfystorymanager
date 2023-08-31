@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Post {
-    id        String  @id @default(auto()) @map("_id") @db.ObjectId
-    postId    String  @unique
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    postId    String   @unique
     title     String
     subreddit String
     author    String
@@ -19,10 +19,12 @@ model Post {
     created   Int
     score     Int
     archived  Boolean
-    Story     Story?  @relation(fields: [storyId], references: [id])
-    storyId   String? @db.ObjectId
+    Story     Story?   @relation(fields: [storyId], references: [id])
+    storyId   String?  @db.ObjectId
     chapter   Int?
     sorted    Sorted
+    Users     User[]   @relation(fields: [userIds], references: [id])
+    userIds   String[] @db.ObjectId
 }
 
 enum Sorted {
@@ -52,7 +54,8 @@ model User {
     sessions             Session[]
     subscribedStories    Story[]   @relation(fields: [subscribedStoriesIds], references: [id])
     subscribedStoriesIds String[]  @db.ObjectId
-    readPosts            String[]
+    readPosts            Post[]    @relation(fields: [readPostsIds], references: [id])
+    readPostsIds         String[]  @db.ObjectId
     role                 UserRole  @default(USER)
 }
 
