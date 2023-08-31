@@ -17,12 +17,22 @@ const CustomStoryFeed = async () => {
                     chapters: {
                         orderBy: {
                             created: "desc"
+                        },
+                        include: {
+                            Users: session
+                                ? {
+                                      where: {
+                                          id: session.user.id
+                                      }
+                                  }
+                                : false
                         }
                     }
                 }
             }
         }
     })
+    //todo remove userids????
 
     return (
         <StoryFeed initialStorys={user?.subscribedStories!} subscribed={true} />
