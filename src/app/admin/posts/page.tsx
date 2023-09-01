@@ -2,15 +2,13 @@
 import { DataTable } from "@/components/ui/table/DataTable"
 
 import { Checkbox } from "@/components/ui/Checkbox"
-import PopoverStoryEdit from "@/components/ui/popovers/PopoverStoryEdit"
 import { DataTableColumnHeader } from "@/components/ui/table/DataTableColumnHeader"
 import { DataTableRowActions } from "@/components/ui/table/DataTableRowActions"
 import { sorted } from "@/components/ui/table/data/Data"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 
-import PopoverChapterEdit from "@/components/ui/popovers/PopoverChapterEdit"
-import PopoverTitleEdit from "@/components/ui/popovers/PopoverTitleEdit"
+import PostEdit from "@/components/PostEdit"
 import { ExtendedPost } from "@/types/db"
 import { TableType } from "@/types/table"
 import { ColumnDef } from "@tanstack/react-table"
@@ -66,13 +64,19 @@ const Page = () => {
                     <DataTableColumnHeader column={column} title="Title" />
                 ),
                 cell: ({ row }) => {
+                    const trigger = (
+                        <div className="flex space-x-2 cursor-pointer">
+                            <span className="max-w-[500px] truncate font-medium">
+                                {row.getValue("title")}
+                            </span>
+                        </div>
+                    )
                     return (
-                        <PopoverTitleEdit
+                        <PostEdit
                             row={row}
-                            title={row.original.title}
-                            id={row.original.id}
-                            data={postData}
-                            setData={setPostData}
+                            trigger={trigger}
+                            postData={postData}
+                            setPostData={setPostData}
                         />
                     )
                 }
@@ -113,11 +117,21 @@ const Page = () => {
                     )
                 },
                 cell: ({ row }) => {
+                    const trigger = (
+                        <div
+                            className={
+                                !row.getValue("Story_title")
+                                    ? "-m-4 p-4 cursor-pointer border-red-400 border-[1px] max-w-[300px] truncate font-medium"
+                                    : "-m-4 p-4 cursor-pointer max-w-[300px] truncate font-medium "
+                            }
+                        >
+                            {row.getValue("Story_title")}
+                        </div>
+                    )
                     return (
-                        <PopoverStoryEdit
+                        <PostEdit
                             row={row}
-                            storyId={row.original.storyId}
-                            id={row.original.id}
+                            trigger={trigger}
                             postData={postData}
                             setPostData={setPostData}
                         />
@@ -130,11 +144,24 @@ const Page = () => {
                     <DataTableColumnHeader column={column} title="Chapter" />
                 ),
                 cell: ({ row }) => {
+                    const trigger = (
+                        <div
+                            className={
+                                row.getValue("chapter") === undefined ||
+                                row.getValue("chapter") === null
+                                    ? "-m-4 p-4 cursor-pointer border-red-400 border-[1px]"
+                                    : "-m-4 p-4 cursor-pointer"
+                            }
+                        >
+                            <span className=" truncate font-medium max-w-xs">
+                                {row.getValue("chapter")}
+                            </span>
+                        </div>
+                    )
                     return (
-                        <PopoverChapterEdit
+                        <PostEdit
                             row={row}
-                            chapter={row.original.chapter}
-                            id={row.original.id}
+                            trigger={trigger}
                             postData={postData}
                             setPostData={setPostData}
                         />

@@ -30,7 +30,7 @@ export async function POST(req: Request) {
                           }
                       }
                     : undefined,
-                chapter: chapter || undefined,
+                chapter: chapter !== undefined ? chapter : undefined,
                 title: title || undefined,
                 sorted: Sorted.SORTED
             },

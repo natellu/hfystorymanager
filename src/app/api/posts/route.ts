@@ -18,6 +18,7 @@ export async function GET(req: Request) {
                 title: "asc"
             },
             select: {
+                author: true,
                 title: true,
                 sorted: true,
                 id: true,
