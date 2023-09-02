@@ -47,7 +47,7 @@ const StoryFeed: FC<StoryFeedProps> = ({
     const stories = data?.pages.flatMap((story) => story) ?? initialStorys
 
     return (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 gap-4 grid-cols-1 lg:grid-cols-3">
             {stories.map((story, index) => {
                 if (index === stories.length - 1)
                     return (
