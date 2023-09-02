@@ -23,12 +23,10 @@ const StoryFeed: FC<StoryFeedProps> = ({
     })
 
     const { data, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
-        ["infinite-query"],
+        ["infinite-query", subscribed],
         async ({ pageParam = 1 }) => {
             const query = `/api/stories?limit=${INFINITE_SCROLLING_PAGINATION_RESULTS}&page=${pageParam}&subscribed=${subscribed}`
-
             const { data } = await axios.get(query)
-
             return data as ExtendedStory[]
         },
         {
