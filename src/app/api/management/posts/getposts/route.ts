@@ -1,7 +1,8 @@
 import { getPosts } from "@/lib/postsManagent"
 
-export async function GET() {
-    // "https://www.reddit.com/r/hfy/new.json?limit=100&after=t3_15icm8o"
+export async function GET(req: Request) {
+    if (req.headers.get("authorization") !== process.env.MANAGEMEN_HEADER_TOKEN)
+        return new Response("Unauthorized", { status: 401 })
 
     getPosts(false)
 
