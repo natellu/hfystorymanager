@@ -6,10 +6,12 @@ import { ExtendedPost } from "@/types/db"
 import {
     Button,
     Dropdown,
+    DropdownItem,
     DropdownMenu,
     DropdownTrigger,
     Input,
     Pagination,
+    SortDescriptor,
     Spinner,
     Table,
     TableBody,
@@ -36,17 +38,10 @@ const fetcher = (url: string) => axios.get(url).then((res) => res.data)
 const Page = () => {
     const [page, setPage] = useState(1)
     const [searchValue, setSearchValue] = useState<string>("")
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>()
     const rowsPerPage = 10
 
     const [stories, setStories] = useState<Story[]>()
-
-    /*     const { data, isLoading } = useSWR(
-        `/api/posts?page=${page}&limit=${rowsPerPage}`,
-        fetcher,
-        {
-            keepPreviousData: true
-        }
-    ) */
 
     const { data: storiesData, refetch: storyRefetch } = useQuery({
         queryFn: async () => {
@@ -63,8 +58,13 @@ const Page = () => {
 
     const { data, refetch, isFetched, isFetching } = useQuery({
         queryFn: async () => {
+            const sortedFilter =
+                statusFilter === "all" ? "" : Array.from(statusFilter).join(",")
+
             const { data } = await axios.get(
-                `/api/posts?page=${page}&limit=${rowsPerPage}&search=${searchValue}`
+                `/api/posts?page=${page}&limit=${rowsPerPage}
+                &search=${searchValue}&orderColumn=${sortDescriptor?.column}
+                &orderDir=${sortDescriptor?.direction}&sorted=${sortedFilter}`
             )
             return data
         },
@@ -75,6 +75,11 @@ const Page = () => {
     useEffect(() => {
         refetch()
     }, [page])
+
+    useEffect(() => {
+        if (!sortDescriptor) return
+        refetch()
+    }, [sortDescriptor])
 
     const pages = useMemo(() => {
         return data?.count ? Math.ceil(data.count / rowsPerPage) : 0
@@ -106,14 +111,18 @@ const Page = () => {
         return p
     }, [data])
 
+    //todo created column to sort by new/old
+
     const columns = [
         {
             key: "title",
-            label: "Title"
+            label: "Title",
+            sortable: true
         },
         {
             key: "sorted",
-            label: "Sorted"
+            label: "Sorted",
+            sortable: true
         },
         {
             key: "storyTitle",
@@ -121,7 +130,8 @@ const Page = () => {
         },
         {
             key: "chapter",
-            label: "Chapter"
+            label: "Chapter",
+            sortable: true
         }
     ]
 
@@ -141,13 +151,21 @@ const Page = () => {
     const [isRowDialogOpen, setIsRowDialogOpen] = useState(false)
     const [rowActionId, setRowActionId] = useState("")
 
+    const [statusFilter, setStatusFilter] = useState<Selection>("all")
+
+    useEffect(() => {
+        if (statusFilter === "all") return
+
+        refetch()
+    }, [statusFilter])
+
     const topContent = (
         <div className="flex flex-col gap-4">
             <div className="flex justify-between gap-3 items-end">
                 <Input
                     isClearable
                     className="w-full sm:max-w-[44%]"
-                    placeholder="Search by name..."
+                    placeholder="Search by title..."
                     startContent={<SearchIcon />}
                     value={searchValue}
                     onClear={() => onClear()}
@@ -169,21 +187,18 @@ const Page = () => {
                             </Button>
                         </DropdownTrigger>
                         <DropdownMenu
-                            disallowEmptySelection
+                            defaultSelectedKeys={"all"}
                             aria-label="Table Columns"
                             closeOnSelect={false}
-                            /* selectedKeys={statusFilter} */
+                            selectedKeys={statusFilter}
                             selectionMode="multiple"
-                            /* onSelectionChange={setStatusFilter} */
+                            onSelectionChange={setStatusFilter}
                         >
-                            {/*  {statusOptions.map((status) => (
-                                    <DropdownItem
-                                        key={status.uid}
-                                        className="capitalize"
-                                    >
-                                        {capitalize(status.name)}
-                                    </DropdownItem>
-                                ))} */}
+                            {Object.keys(Sorted).map((s) => (
+                                <DropdownItem key={s} className="capitalize">
+                                    {s}
+                                </DropdownItem>
+                            ))}
                         </DropdownMenu>
                     </Dropdown>
                     <Dropdown>
@@ -240,6 +255,8 @@ const Page = () => {
     return (
         <div className="container mx-auto py-10">
             <Table
+                sortDescriptor={sortDescriptor}
+                onSortChange={setSortDescriptor}
                 aria-label="Post Table"
                 bottomContentPlacement="outside"
                 bottomContent={
@@ -271,7 +288,10 @@ const Page = () => {
             >
                 <TableHeader columns={columns}>
                     {(column) => (
-                        <TableColumn key={column.key}>
+                        <TableColumn
+                            key={column.key}
+                            allowsSorting={column.sortable}
+                        >
                             {column.label}
                         </TableColumn>
                     )}

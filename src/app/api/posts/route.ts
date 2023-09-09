@@ -1,6 +1,6 @@
 import { getAuthSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { UserRole } from "@prisma/client"
+import { Prisma, Sorted, UserRole } from "@prisma/client"
 import { z } from "zod"
 
 export async function GET(req: Request) {
@@ -14,40 +14,86 @@ export async function GET(req: Request) {
 
     const url = new URL(req.url)
     try {
-        const { page, limit, search } = z
+        const { page, limit, search, orderColumn, orderDir, sorted } = z
             .object({
                 page: z.string(),
                 limit: z.string(),
-                search: z.string().optional()
+                search: z.string().optional(),
+                orderColumn: z.string().optional(),
+                orderDir: z.string().optional(),
+                sorted: z.string().optional()
             })
             .parse({
                 page: url.searchParams.get("page"),
                 limit: url.searchParams.get("limit"),
-                search: url.searchParams.get("search") || undefined
+                search: url.searchParams.get("search") || undefined,
+                orderColumn: url.searchParams.get("orderColumn") || undefined,
+                orderDir: url.searchParams.get("orderDir") || undefined,
+                sorted: url.searchParams.get("sorted") || undefined
             })
 
-        //transaction?
+        let sortedWhereQuery: any[] = []
+        if (
+            sorted === "undefined" ||
+            sorted === undefined ||
+            sorted.split(",").length === Object.keys(Sorted).length
+        ) {
+            sortedWhereQuery = []
+        } else {
+            const sortedFilter = sorted.split(",")
+            sortedWhereQuery = []
 
+            sortedFilter.map((s) => {
+                sortedWhereQuery.push({
+                    sorted: s
+                })
+            })
+        }
+
+        let orderQuery: any = {
+            title: Prisma.SortOrder.asc
+        }
+        if (
+            orderColumn === "undefined" ||
+            orderDir === "undefined" ||
+            orderColumn === undefined
+        ) {
+            orderQuery = {
+                title: Prisma.SortOrder.asc
+            }
+        } else {
+            if (orderDir === "ascending") {
+                orderQuery = {
+                    [orderColumn]: Prisma.SortOrder.asc
+                }
+            } else {
+                orderQuery = {
+                    [orderColumn]: Prisma.SortOrder.desc
+                }
+            }
+        }
+
+        //transaction?
         const countPosts = await db.post.count({
             where: {
                 title: {
                     contains: search || undefined,
                     mode: "insensitive"
-                }
+                },
+                OR: sortedWhereQuery.length > 0 ? sortedWhereQuery : undefined
             }
         })
 
         const posts = await db.post.findMany({
             take: parseInt(limit),
             skip: (parseInt(page) - 1) * parseInt(limit),
-            orderBy: {
-                title: "asc"
-            },
+            orderBy: orderQuery,
             where: {
                 title: {
                     contains: search || undefined,
                     mode: "insensitive"
-                }
+                },
+                OR: sortedWhereQuery.length > 0 ? sortedWhereQuery : undefined
             },
             select: {
                 author: true,
@@ -71,6 +117,7 @@ export async function GET(req: Request) {
             })
         )
     } catch (error) {
+        console.log(error)
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })
 
