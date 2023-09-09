@@ -1,5 +1,6 @@
 "use client"
 
+import CreatePost from "@/components/CreatePost"
 import PostEdit from "@/components/PostEdit"
 import { ExtendedPost } from "@/types/db"
 import {
@@ -22,7 +23,7 @@ import { Sorted, Story } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import debounce from "lodash.debounce"
-import { ChevronDownIcon, PlusIcon, SearchIcon } from "lucide-react"
+import { ChevronDownIcon, SearchIcon } from "lucide-react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 interface pageProps {}
@@ -79,9 +80,6 @@ const Page = () => {
         return data?.count ? Math.ceil(data.count / rowsPerPage) : 0
     }, [data?.count, rowsPerPage])
 
-    const loadingState =
-        isFetching || data?.posts?.length === 0 ? "loading" : "idle"
-
     type PostTableData = {
         id: string
         title: string
@@ -126,8 +124,6 @@ const Page = () => {
             label: "Chapter"
         }
     ]
-
-    const hasSearchFilter = Boolean(searchValue)
 
     const onClear = useCallback(() => {
         setSearchValue("")
@@ -219,9 +215,7 @@ const Page = () => {
                                 ))} */}
                         </DropdownMenu>
                     </Dropdown>
-                    <Button color="primary" endContent={<PlusIcon />}>
-                        Add New
-                    </Button>
+                    <CreatePost refetchData={refetch} />
                 </div>
             </div>
             <div className="flex justify-between items-center">
