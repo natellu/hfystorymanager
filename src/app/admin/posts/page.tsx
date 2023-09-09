@@ -1,5 +1,6 @@
 "use client"
 
+import PostEdit from "@/components/PostEdit"
 import { ExtendedPost } from "@/types/db"
 import {
     Button,
@@ -17,7 +18,7 @@ import {
     TableRow,
     getKeyValue
 } from "@nextui-org/react"
-import { Sorted } from "@prisma/client"
+import { Sorted, Story } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import debounce from "lodash.debounce"
@@ -36,6 +37,8 @@ const Page = () => {
     const [searchValue, setSearchValue] = useState<string>("")
     const rowsPerPage = 10
 
+    const [stories, setStories] = useState<Story[]>()
+
     /*     const { data, isLoading } = useSWR(
         `/api/posts?page=${page}&limit=${rowsPerPage}`,
         fetcher,
@@ -43,6 +46,19 @@ const Page = () => {
             keepPreviousData: true
         }
     ) */
+
+    const { data: storiesData, refetch: storyRefetch } = useQuery({
+        queryFn: async () => {
+            const query = "/api/stories/all"
+
+            const { data } = await axios.get(query)
+
+            setStories(data)
+            return data
+        },
+        queryKey: ["query-all-stories"],
+        enabled: true
+    })
 
     const { data, refetch, isFetched, isFetching } = useQuery({
         queryFn: async () => {
@@ -71,6 +87,7 @@ const Page = () => {
         title: string
         sorted: Sorted
         storyTitle: string
+        storyId: string
         chapter: number
     }
 
@@ -83,8 +100,9 @@ const Page = () => {
                 chapter,
                 title,
                 sorted,
-                storyTitle: Story?.title
-            }
+                storyTitle: Story?.title,
+                storyId: Story?.id
+            } as PostTableData
         })
 
         return p
@@ -123,6 +141,9 @@ const Page = () => {
     const debounceRequest = useCallback(async () => {
         request()
     }, [])
+
+    const [isRowDialogOpen, setIsRowDialogOpen] = useState(false)
+    const [rowActionId, setRowActionId] = useState("")
 
     const topContent = (
         <div className="flex flex-col gap-4">
@@ -246,6 +267,11 @@ const Page = () => {
                 }
                 color={"default"}
                 selectionMode="multiple"
+                selectionBehavior={"toggle"}
+                onRowAction={(id) => {
+                    setRowActionId(id as string)
+                    setIsRowDialogOpen(true)
+                }}
                 topContent={topContent}
                 topContentPlacement="outside"
             >
@@ -272,6 +298,14 @@ const Page = () => {
                     )}
                 </TableBody>
             </Table>
+
+            <PostEdit
+                isOpen={isRowDialogOpen}
+                setIsOpen={setIsRowDialogOpen}
+                postId={rowActionId}
+                refetchAllPosts={refetch}
+                stories={stories}
+            />
         </div>
     )
 }
