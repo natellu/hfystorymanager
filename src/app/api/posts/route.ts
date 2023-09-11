@@ -32,6 +32,9 @@ export async function GET(req: Request) {
                 sorted: url.searchParams.get("sorted") || undefined
             })
 
+        console.log(orderColumn)
+        console.log(orderDir)
+
         let sortedWhereQuery: any[] = []
         if (
             sorted === "undefined" ||
@@ -73,6 +76,8 @@ export async function GET(req: Request) {
             }
         }
 
+        console.log(orderQuery)
+
         //transaction?
         const countPosts = await db.post.count({
             where: {
@@ -98,6 +103,7 @@ export async function GET(req: Request) {
             select: {
                 author: true,
                 title: true,
+                created: true,
                 sorted: true,
                 id: true,
                 chapter: true,
@@ -117,7 +123,8 @@ export async function GET(req: Request) {
             })
         )
     } catch (error) {
-        console.log(error)
+        /* 
+        console.log(error) */
         if (error instanceof z.ZodError)
             return new Response(error.message, { status: 422 })
 

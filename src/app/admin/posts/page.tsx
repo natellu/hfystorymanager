@@ -62,9 +62,7 @@ const Page = () => {
                 statusFilter === "all" ? "" : Array.from(statusFilter).join(",")
 
             const { data } = await axios.get(
-                `/api/posts?page=${page}&limit=${rowsPerPage}
-                &search=${searchValue}&orderColumn=${sortDescriptor?.column}
-                &orderDir=${sortDescriptor?.direction}&sorted=${sortedFilter}`
+                `/api/posts?page=${page}&limit=${rowsPerPage}&search=${searchValue}&orderColumn=${sortDescriptor?.column}&orderDir=${sortDescriptor?.direction}&sorted=${sortedFilter}`
             )
             return data
         },
@@ -92,17 +90,20 @@ const Page = () => {
         storyTitle: string
         storyId: string
         chapter: number
+        created: string
     }
 
     const posts: PostTableData[] = useMemo(() => {
         const p = data?.posts?.map((p: ExtendedPost) => {
-            const { chapter, id, sorted, Story, title } = p
+            const { chapter, id, sorted, Story, title, created } = p
+            const date = new Date(created * 1000)
 
             return {
                 id,
                 chapter,
                 title,
                 sorted,
+                created: date.toLocaleDateString(),
                 storyTitle: Story?.title,
                 storyId: Story?.id
             } as PostTableData
@@ -117,7 +118,8 @@ const Page = () => {
         {
             key: "title",
             label: "Title",
-            sortable: true
+            sortable: true,
+            className: "max-w-[500px]"
         },
         {
             key: "sorted",
@@ -132,8 +134,25 @@ const Page = () => {
             key: "chapter",
             label: "Chapter",
             sortable: true
+        },
+        {
+            key: "created",
+            label: "Posted",
+            sortable: true
         }
     ]
+
+    const INITIAL_VISIBLE_COLUMNS = ["title", "sorted", "storyTitle", "chapter"]
+
+    const [visibleColumns, setVisibleColumns] = useState(
+        new Set(INITIAL_VISIBLE_COLUMNS)
+    )
+
+    const headerColumns = useMemo(() => {
+        return columns.filter((column) =>
+            Array.from(visibleColumns).includes(column.key)
+        )
+    }, [visibleColumns])
 
     const onClear = useCallback(() => {
         setSearchValue("")
@@ -201,6 +220,7 @@ const Page = () => {
                             ))}
                         </DropdownMenu>
                     </Dropdown>
+                    {/* todo not closing when clicking outside */}
                     <Dropdown>
                         <DropdownTrigger className="hidden sm:flex">
                             <Button
@@ -216,18 +236,18 @@ const Page = () => {
                             disallowEmptySelection
                             aria-label="Table Columns"
                             closeOnSelect={false}
-                            /* selectedKeys={visibleColumns}
-                                selectionMode="multiple"
-                                onSelectionChange={setVisibleColumns} */
+                            selectedKeys={visibleColumns}
+                            selectionMode="multiple"
+                            onSelectionChange={setVisibleColumns}
                         >
-                            {/* {columns.map((column) => (
-                                    <DropdownItem
-                                        key={column.uid}
-                                        className="capitalize"
-                                    >
-                                        {capitalize(column.name)}
-                                    </DropdownItem>
-                                ))} */}
+                            {columns.map((column) => (
+                                <DropdownItem
+                                    key={column.key}
+                                    className="capitalize"
+                                >
+                                    {column.key}
+                                </DropdownItem>
+                            ))}
                         </DropdownMenu>
                     </Dropdown>
                     <CreatePost refetchData={refetch} />
@@ -286,11 +306,12 @@ const Page = () => {
                 topContent={topContent}
                 topContentPlacement="outside"
             >
-                <TableHeader columns={columns}>
+                <TableHeader columns={headerColumns}>
                     {(column) => (
                         <TableColumn
                             key={column.key}
                             allowsSorting={column.sortable}
+                            className={column.className}
                         >
                             {column.label}
                         </TableColumn>
