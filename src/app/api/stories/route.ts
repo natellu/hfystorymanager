@@ -19,6 +19,8 @@ export async function GET(req: Request) {
                 subscribed: url.searchParams.get("subscribed")
             })
 
+        console.log(page)
+
         if (subscribed === "true") {
             const user = await db.user.findFirst({
                 where: {

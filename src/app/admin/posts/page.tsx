@@ -1,200 +1,352 @@
 "use client"
-import { DataTable } from "@/components/ui/table/DataTable"
 
-import { Checkbox } from "@/components/ui/Checkbox"
-import { DataTableColumnHeader } from "@/components/ui/table/DataTableColumnHeader"
-import { DataTableRowActions } from "@/components/ui/table/DataTableRowActions"
-import { sorted } from "@/components/ui/table/data/Data"
-import { useQuery } from "@tanstack/react-query"
-import axios from "axios"
-
+import CreatePost from "@/components/CreatePost"
 import PostEdit from "@/components/PostEdit"
 import { ExtendedPost } from "@/types/db"
-import { TableType } from "@/types/table"
-import { ColumnDef } from "@tanstack/react-table"
-import { useMemo, useState } from "react"
+import {
+    Button,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownTrigger,
+    Input,
+    Pagination,
+    SortDescriptor,
+    Spinner,
+    Table,
+    TableBody,
+    TableCell,
+    TableColumn,
+    TableHeader,
+    TableRow,
+    getKeyValue
+} from "@nextui-org/react"
+import { Sorted, Story } from "@prisma/client"
+import { useQuery } from "@tanstack/react-query"
+import axios from "axios"
+import debounce from "lodash.debounce"
+import { ChevronDownIcon, SearchIcon } from "lucide-react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 interface pageProps {}
 
 //todo incremental loading
 //todo delete
 
+const fetcher = (url: string) => axios.get(url).then((res) => res.data)
+
 const Page = () => {
-    const { data, refetch, isFetched, isFetching } = useQuery({
+    const [page, setPage] = useState(1)
+    const [searchValue, setSearchValue] = useState<string>("")
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>()
+    const rowsPerPage = 10
+
+    const [stories, setStories] = useState<Story[]>()
+
+    const { data: storiesData, refetch: storyRefetch } = useQuery({
         queryFn: async () => {
-            const query = `/api/posts`
+            const query = "/api/stories/all"
 
             const { data } = await axios.get(query)
-            setPostData(data)
+
+            setStories(data)
             return data
         },
-        queryKey: ["query-all-posts"]
+        queryKey: ["query-all-stories"],
+        enabled: true
     })
 
-    const [postData, setPostData] = useState<ExtendedPost[]>(data)
+    const { data, refetch, isFetched, isFetching } = useQuery({
+        queryFn: async () => {
+            const sortedFilter =
+                //@ts-ignore
+                statusFilter === "all" ? "" : Array.from(statusFilter).join(",")
 
-    const columns: ColumnDef<ExtendedPost>[] = useMemo(
-        () => [
-            {
-                id: "select",
-                header: ({ table }) => (
-                    <Checkbox
-                        checked={table.getIsAllPageRowsSelected()}
-                        onCheckedChange={(value) =>
-                            table.toggleAllPageRowsSelected(!!value)
-                        }
-                        aria-label="Select all"
-                        className="translate-y-[2px]"
-                    />
-                ),
-                cell: ({ row }) => (
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={(value) => row.toggleSelected(!!value)}
-                        aria-label="Select row"
-                        className="translate-y-[2px]"
-                    />
-                ),
-                enableSorting: false,
-                enableHiding: false
-            },
-            {
-                accessorKey: "title",
-                header: ({ column }) => (
-                    <DataTableColumnHeader column={column} title="Title" />
-                ),
-                cell: ({ row }) => {
-                    const trigger = (
-                        <div className="flex space-x-2 cursor-pointer">
-                            <span className="max-w-[500px] truncate font-medium">
-                                {row.getValue("title")}
-                            </span>
-                        </div>
-                    )
-                    return (
-                        <PostEdit
-                            row={row}
-                            trigger={trigger}
-                            postData={postData}
-                            setPostData={setPostData}
-                        />
-                    )
-                }
-            },
-            {
-                accessorKey: "sorted",
-                header: ({ column }) => (
-                    <DataTableColumnHeader column={column} title="Sorted" />
-                ),
-                cell: ({ row }) => {
-                    const sortedStatus = sorted.find(
-                        (sortedStatus) =>
-                            sortedStatus.value === row.getValue("sorted")
-                    )
+            const { data } = await axios.get(
+                `/api/posts?page=${page}&limit=${rowsPerPage}&search=${searchValue}&orderColumn=${sortDescriptor?.column}&orderDir=${sortDescriptor?.direction}&sorted=${sortedFilter}`
+            )
+            return data
+        },
+        queryKey: ["search-query"],
+        enabled: true
+    })
 
-                    if (!sortedStatus) {
-                        return null
-                    }
+    useEffect(() => {
+        refetch()
+    }, [page])
 
-                    return (
-                        <div className="flex items-center">
-                            {sortedStatus.icon && (
-                                <sortedStatus.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-                            )}
-                            <span>{sortedStatus.label}</span>
-                        </div>
-                    )
-                },
-                filterFn: (row, id, value) => {
-                    return value.includes(row.getValue(id))
-                }
-            },
-            {
-                accessorKey: "Story.title",
-                header: ({ column }) => {
-                    return (
-                        <DataTableColumnHeader column={column} title="Story" />
-                    )
-                },
-                cell: ({ row }) => {
-                    const trigger = (
-                        <div
-                            className={
-                                !row.getValue("Story_title")
-                                    ? "-m-4 p-4 cursor-pointer border-red-400 border-[1px] max-w-[300px] truncate font-medium"
-                                    : "-m-4 p-4 cursor-pointer max-w-[300px] truncate font-medium "
-                            }
-                        >
-                            {row.getValue("Story_title")}
-                        </div>
-                    )
-                    return (
-                        <PostEdit
-                            row={row}
-                            trigger={trigger}
-                            postData={postData}
-                            setPostData={setPostData}
-                        />
-                    )
-                }
-            },
-            {
-                accessorKey: "chapter",
-                header: ({ column }) => (
-                    <DataTableColumnHeader column={column} title="Chapter" />
-                ),
-                cell: ({ row }) => {
-                    const trigger = (
-                        <div
-                            className={
-                                row.getValue("chapter") === undefined ||
-                                row.getValue("chapter") === null
-                                    ? "-m-4 p-4 cursor-pointer border-red-400 border-[1px]"
-                                    : "-m-4 p-4 cursor-pointer"
-                            }
-                        >
-                            <span className=" truncate font-medium max-w-xs">
-                                {row.getValue("chapter")}
-                            </span>
-                        </div>
-                    )
-                    return (
-                        <PostEdit
-                            row={row}
-                            trigger={trigger}
-                            postData={postData}
-                            setPostData={setPostData}
-                        />
-                    )
-                }
-            },
-            {
-                id: "actions",
-                cell: ({ row }) => (
-                    <DataTableRowActions
-                        data={postData}
-                        setData={setPostData}
-                        id={row.original.id}
-                        tableType={TableType.POSTS}
-                    />
-                )
-            }
-        ],
-        [postData]
+    useEffect(() => {
+        if (!sortDescriptor) return
+        refetch()
+    }, [sortDescriptor])
+
+    const pages = useMemo(() => {
+        return data?.count ? Math.ceil(data.count / rowsPerPage) : 0
+    }, [data?.count, rowsPerPage])
+
+    type PostTableData = {
+        id: string
+        title: string
+        sorted: Sorted
+        storyTitle: string
+        storyId: string
+        chapter: number
+        created: string
+    }
+
+    const posts: PostTableData[] = useMemo(() => {
+        const p = data?.posts?.map((p: ExtendedPost) => {
+            const { chapter, id, sorted, Story, title, created } = p
+            const date = new Date(created * 1000)
+
+            return {
+                id,
+                chapter,
+                title,
+                sorted,
+                created: date.toLocaleDateString(),
+                storyTitle: Story?.title,
+                storyId: Story?.id
+            } as PostTableData
+        })
+
+        return p
+    }, [data])
+
+    //todo created column to sort by new/old
+
+    const columns = [
+        {
+            key: "title",
+            label: "Title",
+            sortable: true,
+            className: "max-w-[500px]"
+        },
+        {
+            key: "sorted",
+            label: "Sorted",
+            sortable: true
+        },
+        {
+            key: "storyTitle",
+            label: "Story"
+        },
+        {
+            key: "chapter",
+            label: "Chapter",
+            sortable: true
+        },
+        {
+            key: "created",
+            label: "Posted",
+            sortable: true
+        }
+    ]
+
+    const INITIAL_VISIBLE_COLUMNS = ["title", "sorted", "storyTitle", "chapter"]
+
+    const [visibleColumns, setVisibleColumns] = useState(
+        new Set(INITIAL_VISIBLE_COLUMNS)
     )
 
-    if (!postData) return <div>Loading</div>
+    const headerColumns = useMemo(() => {
+        return columns.filter((column) =>
+            Array.from(visibleColumns).includes(column.key)
+        )
+    }, [visibleColumns])
+
+    const onClear = useCallback(() => {
+        setSearchValue("")
+        setPage(1)
+    }, [])
+
+    const request = debounce(() => {
+        refetch()
+    }, 300)
+
+    const debounceRequest = useCallback(async () => {
+        request()
+    }, [])
+
+    const [isRowDialogOpen, setIsRowDialogOpen] = useState(false)
+    const [rowActionId, setRowActionId] = useState("")
+
+    //@ts-ignore
+    const [statusFilter, setStatusFilter] = useState<Selection>("all")
+
+    useEffect(() => {
+        //@ts-ignore
+        if (statusFilter === "all") return
+
+        refetch()
+    }, [statusFilter])
+
+    const topContent = (
+        <div className="flex flex-col gap-4">
+            <div className="flex justify-between gap-3 items-end">
+                <Input
+                    isClearable
+                    className="w-full sm:max-w-[44%]"
+                    placeholder="Search by title..."
+                    startContent={<SearchIcon />}
+                    value={searchValue}
+                    onClear={() => onClear()}
+                    onValueChange={(text) => {
+                        setSearchValue(text)
+                        debounceRequest()
+                    }}
+                />
+                <div className="flex gap-3">
+                    <Dropdown>
+                        <DropdownTrigger className="hidden sm:flex">
+                            <Button
+                                endContent={
+                                    <ChevronDownIcon className="text-small" />
+                                }
+                                variant="flat"
+                            >
+                                Status
+                            </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            defaultSelectedKeys={"all"}
+                            aria-label="Table Columns"
+                            closeOnSelect={false}
+                            //@ts-ignore
+                            selectedKeys={statusFilter}
+                            selectionMode="multiple"
+                            //@ts-ignore
+                            onSelectionChange={setStatusFilter}
+                        >
+                            {Object.keys(Sorted).map((s) => (
+                                <DropdownItem key={s} className="capitalize">
+                                    {s}
+                                </DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </Dropdown>
+                    {/* todo not closing when clicking outside */}
+                    <Dropdown>
+                        <DropdownTrigger className="hidden sm:flex">
+                            <Button
+                                endContent={
+                                    <ChevronDownIcon className="text-small" />
+                                }
+                                variant="flat"
+                            >
+                                Columns
+                            </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            disallowEmptySelection
+                            aria-label="Table Columns"
+                            closeOnSelect={false}
+                            selectedKeys={visibleColumns}
+                            selectionMode="multiple"
+                            //@ts-ignore
+                            onSelectionChange={setVisibleColumns}
+                        >
+                            {columns.map((column) => (
+                                <DropdownItem
+                                    key={column.key}
+                                    className="capitalize"
+                                >
+                                    {column.key}
+                                </DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </Dropdown>
+                    <CreatePost refetchData={refetch} />
+                </div>
+            </div>
+            <div className="flex justify-between items-center">
+                <span className="text-default-400 text-small">
+                    Total {data?.count} users
+                </span>
+                <label className="flex items-center text-default-400 text-small">
+                    Rows per page:
+                    <select
+                        className="bg-transparent outline-none text-default-400 text-small"
+                        /*  onChange={onRowsPerPageChange} */
+                    >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+    )
 
     return (
         <div className="container mx-auto py-10">
-            {postData ? (
-                <DataTable
-                    columns={columns}
-                    data={postData}
-                    tableType={TableType.POSTS}
-                    refetchData={refetch}
-                />
-            ) : null}
+            <Table
+                sortDescriptor={sortDescriptor}
+                onSortChange={setSortDescriptor}
+                aria-label="Post Table"
+                bottomContentPlacement="outside"
+                bottomContent={
+                    pages > 0 ? (
+                        <div className="flex w-full justify-center">
+                            <Pagination
+                                isCompact
+                                showControls
+                                showShadow
+                                color="primary"
+                                page={page}
+                                total={pages}
+                                onChange={(page) => {
+                                    setPage(page)
+                                }}
+                            />
+                        </div>
+                    ) : null
+                }
+                color={"default"}
+                selectionMode="multiple"
+                selectionBehavior={"toggle"}
+                onRowAction={(id) => {
+                    setRowActionId(id as string)
+                    setIsRowDialogOpen(true)
+                }}
+                topContent={topContent}
+                topContentPlacement="outside"
+            >
+                <TableHeader columns={headerColumns}>
+                    {(column) => (
+                        <TableColumn
+                            key={column.key}
+                            allowsSorting={column.sortable}
+                            className={column.className}
+                        >
+                            {column.label}
+                        </TableColumn>
+                    )}
+                </TableHeader>
+                <TableBody
+                    isLoading={isFetching}
+                    items={posts ?? []}
+                    loadingContent={<Spinner label="Loading..." />}
+                >
+                    {(item: PostTableData) => (
+                        <TableRow key={item.id}>
+                            {(columnKey) => (
+                                <TableCell>
+                                    {getKeyValue(item, columnKey)}
+                                </TableCell>
+                            )}
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+
+            <PostEdit
+                isOpen={isRowDialogOpen}
+                setIsOpen={setIsRowDialogOpen}
+                postId={rowActionId}
+                refetchAllPosts={refetch}
+                stories={stories}
+            />
         </div>
     )
 }
