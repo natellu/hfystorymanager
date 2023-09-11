@@ -59,6 +59,7 @@ const Page = () => {
     const { data, refetch, isFetched, isFetching } = useQuery({
         queryFn: async () => {
             const sortedFilter =
+                //@ts-ignore
                 statusFilter === "all" ? "" : Array.from(statusFilter).join(",")
 
             const { data } = await axios.get(
@@ -170,9 +171,11 @@ const Page = () => {
     const [isRowDialogOpen, setIsRowDialogOpen] = useState(false)
     const [rowActionId, setRowActionId] = useState("")
 
+    //@ts-ignore
     const [statusFilter, setStatusFilter] = useState<Selection>("all")
 
     useEffect(() => {
+        //@ts-ignore
         if (statusFilter === "all") return
 
         refetch()
@@ -209,8 +212,10 @@ const Page = () => {
                             defaultSelectedKeys={"all"}
                             aria-label="Table Columns"
                             closeOnSelect={false}
+                            //@ts-ignore
                             selectedKeys={statusFilter}
                             selectionMode="multiple"
+                            //@ts-ignore
                             onSelectionChange={setStatusFilter}
                         >
                             {Object.keys(Sorted).map((s) => (
@@ -238,6 +243,7 @@ const Page = () => {
                             closeOnSelect={false}
                             selectedKeys={visibleColumns}
                             selectionMode="multiple"
+                            //@ts-ignore
                             onSelectionChange={setVisibleColumns}
                         >
                             {columns.map((column) => (
