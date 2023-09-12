@@ -34,9 +34,21 @@ const Page = () => {
     const [page, setPage] = useState(1)
     const [searchValue, setSearchValue] = useState<string>("")
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>()
-    const rowsPerPage = 10
+
+    const [rowsPerPage, setRowsPerPage] = useState(10)
 
     const [stories, setStories] = useState<Story[]>()
+    const [isRowDialogOpen, setIsRowDialogOpen] = useState(false)
+    const [rowActionId, setRowActionId] = useState("")
+
+    //@ts-ignore
+    const [statusFilter, setStatusFilter] = useState<Selection>("all")
+
+    const INITIAL_VISIBLE_COLUMNS = ["title", "sorted", "storyTitle", "chapter"]
+
+    const [visibleColumns, setVisibleColumns] = useState(
+        new Set(INITIAL_VISIBLE_COLUMNS)
+    )
 
     const { data: storiesData, refetch: storyRefetch } = useQuery({
         queryFn: async () => {
@@ -68,12 +80,7 @@ const Page = () => {
 
     useEffect(() => {
         refetch()
-    }, [page])
-
-    useEffect(() => {
-        if (!sortDescriptor) return
-        refetch()
-    }, [sortDescriptor])
+    }, [page, rowsPerPage, sortDescriptor, statusFilter])
 
     const pages = useMemo(() => {
         return data?.count ? Math.ceil(data.count / rowsPerPage) : 0
@@ -137,12 +144,6 @@ const Page = () => {
         }
     ]
 
-    const INITIAL_VISIBLE_COLUMNS = ["title", "sorted", "storyTitle", "chapter"]
-
-    const [visibleColumns, setVisibleColumns] = useState(
-        new Set(INITIAL_VISIBLE_COLUMNS)
-    )
-
     const headerColumns = useMemo(() => {
         return columns.filter((column) =>
             Array.from(visibleColumns).includes(column.key)
@@ -161,19 +162,6 @@ const Page = () => {
     const debounceRequest = useCallback(async () => {
         request()
     }, [])
-
-    const [isRowDialogOpen, setIsRowDialogOpen] = useState(false)
-    const [rowActionId, setRowActionId] = useState("")
-
-    //@ts-ignore
-    const [statusFilter, setStatusFilter] = useState<Selection>("all")
-
-    useEffect(() => {
-        //@ts-ignore
-        if (statusFilter === "all") return
-
-        refetch()
-    }, [statusFilter])
 
     const topContent = (
         <div className="flex flex-col gap-4">
@@ -261,11 +249,13 @@ const Page = () => {
                     Rows per page:
                     <select
                         className="bg-transparent outline-none text-default-400 text-small"
-                        /*  onChange={onRowsPerPageChange} */
+                        onChange={(e) =>
+                            setRowsPerPage(parseInt(e.target.value))
+                        }
                     >
-                        <option value="5">5</option>
                         <option value="10">10</option>
-                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
                     </select>
                 </label>
             </div>
