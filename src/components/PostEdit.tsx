@@ -88,11 +88,6 @@ const PostEdit: FC<PostEditProps> = ({
                 title: post.title
             }
             const { data } = await axios.post("/api/posts/update", payload)
-
-            refetch()
-
-            //todo move this to parent to reduce fetching when multiple updates ????
-            refetchAllPosts()
         },
         onError: (err) => {
             toast({
@@ -107,6 +102,12 @@ const PostEdit: FC<PostEditProps> = ({
                 description: "Post updated",
                 variant: "default"
             })
+
+            //todo move this to parent to reduce fetching when multiple updates ????
+            refetchAllPosts()
+
+            refetch()
+            setIsOpen(false)
         }
     })
 
@@ -288,7 +289,7 @@ const PostEdit: FC<PostEditProps> = ({
                             >
                                 Cancel
                             </Button>
-                        </div>{" "}
+                        </div>
                     </div>
                 ) : (
                     <Spinner />

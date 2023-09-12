@@ -28,12 +28,7 @@ import debounce from "lodash.debounce"
 import { ChevronDownIcon, SearchIcon } from "lucide-react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
-interface pageProps {}
-
-//todo incremental loading
 //todo delete
-
-const fetcher = (url: string) => axios.get(url).then((res) => res.data)
 
 const Page = () => {
     const [page, setPage] = useState(1)
@@ -49,8 +44,8 @@ const Page = () => {
 
             const { data } = await axios.get(query)
 
-            setStories(data)
-            return data
+            setStories(data.stories)
+            return data.stories
         },
         queryKey: ["query-all-stories"],
         enabled: true
@@ -119,8 +114,7 @@ const Page = () => {
         {
             key: "title",
             label: "Title",
-            sortable: true,
-            className: "max-w-[500px]"
+            sortable: true
         },
         {
             key: "sorted",
@@ -261,7 +255,7 @@ const Page = () => {
             </div>
             <div className="flex justify-between items-center">
                 <span className="text-default-400 text-small">
-                    Total {data?.count} users
+                    Total {data?.count} posts
                 </span>
                 <label className="flex items-center text-default-400 text-small">
                     Rows per page:
@@ -317,7 +311,6 @@ const Page = () => {
                         <TableColumn
                             key={column.key}
                             allowsSorting={column.sortable}
-                            className={column.className}
                         >
                             {column.label}
                         </TableColumn>

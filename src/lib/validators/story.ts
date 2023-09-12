@@ -12,3 +12,11 @@ export const StoryAddValidator = z.object({
 })
 
 export type StoryAddPayload = z.infer<typeof StoryAddValidator>
+
+export const UpdateStoryValidator = z.object({
+    id: z.string(),
+    title: z.string().optional(),
+    chapters: z.array(z.string()).optional()
+})
+
+export type UpdateStoryPayload = z.infer<typeof UpdateStoryValidator>

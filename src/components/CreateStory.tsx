@@ -2,11 +2,11 @@
 import { useCustomToast } from "@/hooks/use-custom-toast"
 import { toast } from "@/hooks/use-toast"
 import { StoryAddPayload } from "@/lib/validators/story"
+import { Button } from "@nextui-org/react"
 import { useMutation } from "@tanstack/react-query"
 import axios, { AxiosError } from "axios"
-import { PlusCircleIcon } from "lucide-react"
+import { PlusIcon } from "lucide-react"
 import { FC, useState } from "react"
-import { Button } from "./ui/Button"
 import {
     Dialog,
     DialogContent,
@@ -76,12 +76,8 @@ const CreateStory: FC<CreateStoryProps> = ({ refetchData }) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button
-                    variant="default"
-                    size="sm"
-                    className="ml-auto hidden h-8 lg:flex"
-                >
-                    <PlusCircleIcon className="mr-2 h-4 w-4" /> New Story
+                <Button color="primary" endContent={<PlusIcon />}>
+                    New Story
                 </Button>
             </DialogTrigger>
             <DialogContent>
