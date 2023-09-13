@@ -21,7 +21,7 @@ model Post {
     archived  Boolean
     Story     Story?   @relation(fields: [storyId], references: [id])
     storyId   String?  @db.ObjectId
-    chapter   Int?
+    chapter   Float?
     sorted    Sorted
     Users     User[]   @relation(fields: [userIds], references: [id])
     userIds   String[] @db.ObjectId

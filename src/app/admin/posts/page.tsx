@@ -25,8 +25,8 @@ import { Sorted, Story } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import debounce from "lodash.debounce"
-import { ChevronDownIcon, SearchIcon } from "lucide-react"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { ChevronDownIcon, MoreVerticalIcon, SearchIcon } from "lucide-react"
+import { Key, useCallback, useEffect, useMemo, useState } from "react"
 
 //todo delete
 
@@ -44,7 +44,13 @@ const Page = () => {
     //@ts-ignore
     const [statusFilter, setStatusFilter] = useState<Selection>("all")
 
-    const INITIAL_VISIBLE_COLUMNS = ["title", "sorted", "storyTitle", "chapter"]
+    const INITIAL_VISIBLE_COLUMNS = [
+        "title",
+        "sorted",
+        "storyTitle",
+        "chapter",
+        "actions"
+    ]
 
     const [visibleColumns, setVisibleColumns] = useState(
         new Set(INITIAL_VISIBLE_COLUMNS)
@@ -94,14 +100,16 @@ const Page = () => {
         storyId: string
         chapter: number
         created: string
+        permalink: string
     }
 
     const posts: PostTableData[] = useMemo(() => {
         const p = data?.posts?.map((p: ExtendedPost) => {
-            const { chapter, id, sorted, Story, title, created } = p
+            const { chapter, id, sorted, Story, title, created, permalink } = p
             const date = new Date(created * 1000)
 
             return {
+                permalink,
                 id,
                 chapter,
                 title,
@@ -141,6 +149,10 @@ const Page = () => {
             key: "created",
             label: "Posted",
             sortable: true
+        },
+        {
+            key: "actions",
+            label: "Actions"
         }
     ]
 
@@ -262,6 +274,40 @@ const Page = () => {
         </div>
     )
 
+    const renderCell = useCallback((item: PostTableData, columnKey: Key) => {
+        switch (columnKey) {
+            case "actions":
+                return (
+                    <div className="relative flex justify-end items-center gap-2">
+                        <Dropdown>
+                            <DropdownTrigger>
+                                <Button isIconOnly size="sm" variant="light">
+                                    <MoreVerticalIcon className="text-default-300" />
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu>
+                                <DropdownItem
+                                    onClick={() =>
+                                        window.open(
+                                            `https://reddit.com${item.permalink}`,
+                                            "_blank"
+                                        )
+                                    }
+                                >
+                                    View
+                                </DropdownItem>
+
+                                <DropdownItem>Edit</DropdownItem>
+                                <DropdownItem>Delete</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
+                )
+            default:
+                return <div>{getKeyValue(item, columnKey)}</div>
+        }
+    }, [])
+
     return (
         <div className="container mx-auto py-10">
             <Table
@@ -315,7 +361,7 @@ const Page = () => {
                         <TableRow key={item.id}>
                             {(columnKey) => (
                                 <TableCell>
-                                    {getKeyValue(item, columnKey)}
+                                    {renderCell(item, columnKey)}
                                 </TableCell>
                             )}
                         </TableRow>

@@ -273,7 +273,7 @@ const PostEdit: FC<PostEditProps> = ({
                                     onChange={(e) =>
                                         setPost({
                                             ...post,
-                                            chapter: parseInt(e.target.value)
+                                            chapter: parseFloat(e.target.value)
                                         })
                                     }
                                 />
