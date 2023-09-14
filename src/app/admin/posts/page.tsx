@@ -298,8 +298,6 @@ const Page = () => {
         </div>
     )
 
-    const [postToDeleteId, setPostToDeleteId] = useState("")
-
     const { mutate: deletePost, isLoading: deletePostLoading } = useMutation({
         mutationFn: async (id: string) => {
             if (!id || id === "") throw new Error()
@@ -362,7 +360,7 @@ const Page = () => {
                                     showDivider
                                     onClick={() =>
                                         window.open(
-                                            `/story/${item.st}`,
+                                            `/story/${item.storyId}`,
                                             "_blank"
                                         )
                                     }
