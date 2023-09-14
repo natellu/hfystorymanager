@@ -269,7 +269,11 @@ const PostEdit: FC<PostEditProps> = ({
                                     id="chapter"
                                     type="number"
                                     placeholder="0"
-                                    value={post.chapter || 0}
+                                    value={
+                                        post.chapter === null
+                                            ? ""
+                                            : post.chapter
+                                    }
                                     onChange={(e) =>
                                         setPost({
                                             ...post,

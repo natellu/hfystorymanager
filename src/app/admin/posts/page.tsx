@@ -1,6 +1,7 @@
 "use client"
 
 import CreatePost from "@/components/CreatePost"
+import EditMultiplePosts from "@/components/EditMultiplePosts"
 import PostEdit from "@/components/PostEdit"
 import { ExtendedPost } from "@/types/db"
 import {
@@ -44,6 +45,8 @@ const Page = () => {
     //@ts-ignore
     const [statusFilter, setStatusFilter] = useState<Selection>("all")
 
+    const [selectedPosts, setSelectedPosts] = useState<Key[]>([])
+
     const INITIAL_VISIBLE_COLUMNS = [
         "title",
         "sorted",
@@ -78,6 +81,7 @@ const Page = () => {
             const { data } = await axios.get(
                 `/api/posts?page=${page}&limit=${rowsPerPage}&search=${searchValue}&orderColumn=${sortDescriptor?.column}&orderDir=${sortDescriptor?.direction}&sorted=${sortedFilter}`
             )
+            setSelectedPosts([])
             return data
         },
         queryKey: ["search-query"],
@@ -161,6 +165,18 @@ const Page = () => {
             Array.from(visibleColumns).includes(column.key)
         )
     }, [visibleColumns])
+
+    useEffect(() => {
+        if (selectedPosts.length === 1 && selectedPosts[0] === "all") {
+            let s: Key[] = []
+            posts.map((p) => s.push(p.id))
+            setSelectedPosts(s)
+        }
+    }, [selectedPosts])
+
+    useEffect(() => {
+        setSelectedPosts([])
+    }, [page])
 
     const onClear = useCallback(() => {
         setSearchValue("")
@@ -317,7 +333,16 @@ const Page = () => {
                 bottomContentPlacement="outside"
                 bottomContent={
                     pages > 0 ? (
-                        <div className="flex w-full justify-center">
+                        <div className="flex justify-between w-full  ">
+                            <EditMultiplePosts
+                                refetchAllPosts={refetch}
+                                stories={stories}
+                                isDisabled={
+                                    !selectedPosts || selectedPosts.length === 0
+                                }
+                                selectedPosts={selectedPosts}
+                            />
+
                             <Pagination
                                 isCompact
                                 showControls
@@ -335,6 +360,21 @@ const Page = () => {
                 color={"default"}
                 selectionMode="multiple"
                 selectionBehavior={"toggle"}
+                //@ts-ignore
+                selectedKeys={selectedPosts}
+                onSelectionChange={(e) => {
+                    if (e === "all") {
+                        setSelectedPosts(["all"])
+                        return
+                    }
+
+                    if (Array.from(e).length === 0) {
+                        setSelectedPosts([])
+                        return
+                    }
+
+                    setSelectedPosts(Array.from(e))
+                }}
                 onRowAction={(id) => {
                     setRowActionId(id as string)
                     setIsRowDialogOpen(true)
