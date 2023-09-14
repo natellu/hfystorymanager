@@ -106,7 +106,8 @@ export async function GET(req: Request) {
                 permalink: true,
                 Story: {
                     select: {
-                        title: true
+                        title: true,
+                        id: true
                     }
                 }
             }

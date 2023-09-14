@@ -178,8 +178,6 @@ const Page = ({}) => {
                     ) : null
                 }
                 color={"default"}
-                selectionMode="multiple"
-                selectionBehavior={"toggle"}
                 onRowAction={(id) => {
                     setRowActionId(id as string)
                     setIsRowDialogOpen(true)

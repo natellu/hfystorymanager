@@ -3,6 +3,8 @@
 import CreatePost from "@/components/CreatePost"
 import EditMultiplePosts from "@/components/EditMultiplePosts"
 import PostEdit from "@/components/PostEdit"
+import { toast } from "@/hooks/use-toast"
+import { PostPayload } from "@/lib/validators/post"
 import { ExtendedPost } from "@/types/db"
 import {
     Button,
@@ -23,10 +25,16 @@ import {
     getKeyValue
 } from "@nextui-org/react"
 import { Sorted, Story } from "@prisma/client"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import debounce from "lodash.debounce"
-import { ChevronDownIcon, MoreVerticalIcon, SearchIcon } from "lucide-react"
+import {
+    ChevronDownIcon,
+    MoreVerticalIcon,
+    MoveUpRightIcon,
+    SearchIcon,
+    Trash2Icon
+} from "lucide-react"
 import { Key, useCallback, useEffect, useMemo, useState } from "react"
 
 //todo delete
@@ -290,6 +298,35 @@ const Page = () => {
         </div>
     )
 
+    const [postToDeleteId, setPostToDeleteId] = useState("")
+
+    const { mutate: deletePost, isLoading: deletePostLoading } = useMutation({
+        mutationFn: async (id: string) => {
+            if (!id || id === "") throw new Error()
+
+            const payload: PostPayload = {
+                id
+            }
+
+            const { data } = await axios.post("/api/posts/delete", payload)
+        },
+        onError: (err) => {
+            toast({
+                title: "There was an error.",
+                description: "Could not delete post. Please try again.",
+                variant: "destructive"
+            })
+        },
+        onSuccess: (data) => {
+            toast({
+                title: "Success",
+                description: "Post deleted",
+                variant: "default"
+            })
+            refetch()
+        }
+    })
+
     const renderCell = useCallback((item: PostTableData, columnKey: Key) => {
         switch (columnKey) {
             case "actions":
@@ -303,6 +340,10 @@ const Page = () => {
                             </DropdownTrigger>
                             <DropdownMenu>
                                 <DropdownItem
+                                    startContent={
+                                        <MoveUpRightIcon className="text-xl pointer-events-none flex-shrink-0 text-default-500" />
+                                    }
+                                    description="View post on reddit"
                                     onClick={() =>
                                         window.open(
                                             `https://reddit.com${item.permalink}`,
@@ -310,11 +351,38 @@ const Page = () => {
                                         )
                                     }
                                 >
-                                    View
+                                    View on Reddit
                                 </DropdownItem>
 
-                                <DropdownItem>Edit</DropdownItem>
-                                <DropdownItem>Delete</DropdownItem>
+                                <DropdownItem
+                                    startContent={
+                                        <MoveUpRightIcon className="text-xl pointer-events-none flex-shrink-0 text-default-500" />
+                                    }
+                                    description="View full Story"
+                                    showDivider
+                                    onClick={() =>
+                                        window.open(
+                                            `/story/${item.st}`,
+                                            "_blank"
+                                        )
+                                    }
+                                >
+                                    View Story
+                                </DropdownItem>
+
+                                <DropdownItem
+                                    color="danger"
+                                    className="text-danger"
+                                    description="Permanently delete the file"
+                                    startContent={
+                                        <Trash2Icon className="text-xl pointer-events-none flex-shrink-0 text-danger-200" />
+                                    }
+                                    onClick={() => {
+                                        deletePost(item.id)
+                                    }}
+                                >
+                                    Delete
+                                </DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                     </div>
