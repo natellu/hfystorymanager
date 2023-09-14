@@ -103,9 +103,11 @@ export async function GET(req: Request) {
                 id: true,
                 chapter: true,
                 storyId: true,
+                permalink: true,
                 Story: {
                     select: {
-                        title: true
+                        title: true,
+                        id: true
                     }
                 }
             }

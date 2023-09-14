@@ -1,7 +1,10 @@
 "use client"
 
 import CreatePost from "@/components/CreatePost"
+import EditMultiplePosts from "@/components/EditMultiplePosts"
 import PostEdit from "@/components/PostEdit"
+import { toast } from "@/hooks/use-toast"
+import { PostPayload } from "@/lib/validators/post"
 import { ExtendedPost } from "@/types/db"
 import {
     Button,
@@ -22,11 +25,17 @@ import {
     getKeyValue
 } from "@nextui-org/react"
 import { Sorted, Story } from "@prisma/client"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import debounce from "lodash.debounce"
-import { ChevronDownIcon, SearchIcon } from "lucide-react"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import {
+    ChevronDownIcon,
+    MoreVerticalIcon,
+    MoveUpRightIcon,
+    SearchIcon,
+    Trash2Icon
+} from "lucide-react"
+import { Key, useCallback, useEffect, useMemo, useState } from "react"
 
 //todo delete
 
@@ -44,7 +53,15 @@ const Page = () => {
     //@ts-ignore
     const [statusFilter, setStatusFilter] = useState<Selection>("all")
 
-    const INITIAL_VISIBLE_COLUMNS = ["title", "sorted", "storyTitle", "chapter"]
+    const [selectedPosts, setSelectedPosts] = useState<Key[]>([])
+
+    const INITIAL_VISIBLE_COLUMNS = [
+        "title",
+        "sorted",
+        "storyTitle",
+        "chapter",
+        "actions"
+    ]
 
     const [visibleColumns, setVisibleColumns] = useState(
         new Set(INITIAL_VISIBLE_COLUMNS)
@@ -72,6 +89,7 @@ const Page = () => {
             const { data } = await axios.get(
                 `/api/posts?page=${page}&limit=${rowsPerPage}&search=${searchValue}&orderColumn=${sortDescriptor?.column}&orderDir=${sortDescriptor?.direction}&sorted=${sortedFilter}`
             )
+            setSelectedPosts([])
             return data
         },
         queryKey: ["search-query"],
@@ -94,14 +112,16 @@ const Page = () => {
         storyId: string
         chapter: number
         created: string
+        permalink: string
     }
 
     const posts: PostTableData[] = useMemo(() => {
         const p = data?.posts?.map((p: ExtendedPost) => {
-            const { chapter, id, sorted, Story, title, created } = p
+            const { chapter, id, sorted, Story, title, created, permalink } = p
             const date = new Date(created * 1000)
 
             return {
+                permalink,
                 id,
                 chapter,
                 title,
@@ -141,6 +161,10 @@ const Page = () => {
             key: "created",
             label: "Posted",
             sortable: true
+        },
+        {
+            key: "actions",
+            label: "Actions"
         }
     ]
 
@@ -149,6 +173,18 @@ const Page = () => {
             Array.from(visibleColumns).includes(column.key)
         )
     }, [visibleColumns])
+
+    useEffect(() => {
+        if (selectedPosts.length === 1 && selectedPosts[0] === "all") {
+            let s: Key[] = []
+            posts.map((p) => s.push(p.id))
+            setSelectedPosts(s)
+        }
+    }, [selectedPosts])
+
+    useEffect(() => {
+        setSelectedPosts([])
+    }, [page])
 
     const onClear = useCallback(() => {
         setSearchValue("")
@@ -262,6 +298,98 @@ const Page = () => {
         </div>
     )
 
+    const { mutate: deletePost, isLoading: deletePostLoading } = useMutation({
+        mutationFn: async (id: string) => {
+            if (!id || id === "") throw new Error()
+
+            const payload: PostPayload = {
+                id
+            }
+
+            const { data } = await axios.post("/api/posts/delete", payload)
+        },
+        onError: (err) => {
+            toast({
+                title: "There was an error.",
+                description: "Could not delete post. Please try again.",
+                variant: "destructive"
+            })
+        },
+        onSuccess: (data) => {
+            toast({
+                title: "Success",
+                description: "Post deleted",
+                variant: "default"
+            })
+            refetch()
+        }
+    })
+
+    const renderCell = useCallback((item: PostTableData, columnKey: Key) => {
+        switch (columnKey) {
+            case "actions":
+                return (
+                    <div className="relative flex justify-end items-center gap-2">
+                        <Dropdown>
+                            <DropdownTrigger>
+                                <Button isIconOnly size="sm" variant="light">
+                                    <MoreVerticalIcon className="text-default-300" />
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu>
+                                <DropdownItem
+                                    startContent={
+                                        <MoveUpRightIcon className="text-xl pointer-events-none flex-shrink-0 text-default-500" />
+                                    }
+                                    description="View post on reddit"
+                                    onClick={() =>
+                                        window.open(
+                                            `https://reddit.com${item.permalink}`,
+                                            "_blank"
+                                        )
+                                    }
+                                >
+                                    View on Reddit
+                                </DropdownItem>
+
+                                <DropdownItem
+                                    startContent={
+                                        <MoveUpRightIcon className="text-xl pointer-events-none flex-shrink-0 text-default-500" />
+                                    }
+                                    description="View full Story"
+                                    showDivider
+                                    onClick={() =>
+                                        window.open(
+                                            `/story/${item.storyId}`,
+                                            "_blank"
+                                        )
+                                    }
+                                >
+                                    View Story
+                                </DropdownItem>
+
+                                <DropdownItem
+                                    color="danger"
+                                    className="text-danger"
+                                    description="Permanently delete the file"
+                                    startContent={
+                                        <Trash2Icon className="text-xl pointer-events-none flex-shrink-0 text-danger-200" />
+                                    }
+                                    onClick={() => {
+                                        deletePost(item.id)
+                                    }}
+                                >
+                                    Delete
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
+                )
+            default:
+                return <div>{getKeyValue(item, columnKey)}</div>
+        }
+    }, [])
+
     return (
         <div className="container mx-auto py-10">
             <Table
@@ -271,7 +399,16 @@ const Page = () => {
                 bottomContentPlacement="outside"
                 bottomContent={
                     pages > 0 ? (
-                        <div className="flex w-full justify-center">
+                        <div className="flex justify-between w-full  ">
+                            <EditMultiplePosts
+                                refetchAllPosts={refetch}
+                                stories={stories}
+                                isDisabled={
+                                    !selectedPosts || selectedPosts.length === 0
+                                }
+                                selectedPosts={selectedPosts}
+                            />
+
                             <Pagination
                                 isCompact
                                 showControls
@@ -289,6 +426,21 @@ const Page = () => {
                 color={"default"}
                 selectionMode="multiple"
                 selectionBehavior={"toggle"}
+                //@ts-ignore
+                selectedKeys={selectedPosts}
+                onSelectionChange={(e) => {
+                    if (e === "all") {
+                        setSelectedPosts(["all"])
+                        return
+                    }
+
+                    if (Array.from(e).length === 0) {
+                        setSelectedPosts([])
+                        return
+                    }
+
+                    setSelectedPosts(Array.from(e))
+                }}
                 onRowAction={(id) => {
                     setRowActionId(id as string)
                     setIsRowDialogOpen(true)
@@ -315,7 +467,7 @@ const Page = () => {
                         <TableRow key={item.id}>
                             {(columnKey) => (
                                 <TableCell>
-                                    {getKeyValue(item, columnKey)}
+                                    {renderCell(item, columnKey)}
                                 </TableCell>
                             )}
                         </TableRow>

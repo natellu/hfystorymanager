@@ -1,8 +1,15 @@
 "use client"
 import CreateStory from "@/components/CreateStory"
 import StoryEdit from "@/components/StoryEdit"
+import { toast } from "@/hooks/use-toast"
+import { StoryPayload } from "@/lib/validators/story"
 import { ExtendedStory } from "@/types/db"
 import {
+    Button,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownTrigger,
     Input,
     Pagination,
     SortDescriptor,
@@ -15,14 +22,19 @@ import {
     TableRow,
     getKeyValue
 } from "@nextui-org/react"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import debounce from "lodash.debounce"
-import { SearchIcon } from "lucide-react"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import {
+    MoreVerticalIcon,
+    MoveUpRightIcon,
+    SearchIcon,
+    Trash2Icon
+} from "lucide-react"
+import { Key, useCallback, useEffect, useMemo, useState } from "react"
 
 const Page = ({}) => {
-    const INITIAL_VISIBLE_COLUMNS = ["title", "chapters"]
+    const INITIAL_VISIBLE_COLUMNS = ["title", "chapters", "actions"]
 
     const [page, setPage] = useState(1)
     const [searchValue, setSearchValue] = useState<string>("")
@@ -91,6 +103,10 @@ const Page = ({}) => {
             key: "chapters",
             label: "Chapters",
             sortable: true
+        },
+        {
+            key: "actions",
+            label: "Actions"
         }
     ]
 
@@ -111,6 +127,83 @@ const Page = ({}) => {
 
     const debounceRequest = useCallback(async () => {
         request()
+    }, [])
+
+    const { mutate: deleteStory, isLoading: deleteStoryLoading } = useMutation({
+        mutationFn: async (id: string) => {
+            if (!id || id === "") throw new Error()
+
+            const payload: StoryPayload = {
+                storyId: id
+            }
+
+            const { data } = await axios.post("/api/stories/delete", payload)
+        },
+        onError: (err) => {
+            toast({
+                title: "There was an error.",
+                description: "Could not delete story. Please try again.",
+                variant: "destructive"
+            })
+        },
+        onSuccess: (data) => {
+            toast({
+                title: "Success",
+                description: "Story deleted",
+                variant: "default"
+            })
+            refetch()
+        }
+    })
+
+    const renderCell = useCallback((story: StoryTableData, columnKey: Key) => {
+        switch (columnKey) {
+            case "actions":
+                return (
+                    <div className="relative flex justify-end items-center gap-2">
+                        <Dropdown>
+                            <DropdownTrigger>
+                                <Button isIconOnly size="sm" variant="light">
+                                    <MoreVerticalIcon className="text-default-300" />
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu>
+                                <DropdownItem
+                                    startContent={
+                                        <MoveUpRightIcon className="text-xl pointer-events-none flex-shrink-0 text-default-500" />
+                                    }
+                                    description="View full Story"
+                                    showDivider
+                                    onClick={() =>
+                                        window.open(
+                                            `/story/${story.id}`,
+                                            "_blank"
+                                        )
+                                    }
+                                >
+                                    View Story
+                                </DropdownItem>
+
+                                <DropdownItem
+                                    color="danger"
+                                    className="text-danger"
+                                    description="Permanently delete the file"
+                                    startContent={
+                                        <Trash2Icon className="text-xl pointer-events-none flex-shrink-0 text-danger-200" />
+                                    }
+                                    onClick={() => {
+                                        deleteStory(story.id)
+                                    }}
+                                >
+                                    Delete
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
+                )
+            default:
+                return <div>{getKeyValue(story, columnKey)}</div>
+        }
     }, [])
 
     const topContent = (
@@ -178,8 +271,6 @@ const Page = ({}) => {
                     ) : null
                 }
                 color={"default"}
-                selectionMode="multiple"
-                selectionBehavior={"toggle"}
                 onRowAction={(id) => {
                     setRowActionId(id as string)
                     setIsRowDialogOpen(true)
@@ -206,7 +297,7 @@ const Page = ({}) => {
                         <TableRow key={item.id}>
                             {(columnKey) => (
                                 <TableCell>
-                                    {getKeyValue(item, columnKey)}
+                                    {renderCell(item, columnKey)}
                                 </TableCell>
                             )}
                         </TableRow>
