@@ -21,7 +21,7 @@ import { Story } from "@prisma/client"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import axios from "axios"
 import { CheckIcon, Trash2Icon } from "lucide-react"
-import { FC, Key, useEffect, useState } from "react"
+import { FC, Key, useEffect, useRef, useState } from "react"
 import {
     Command,
     CommandEmpty,
@@ -124,6 +124,12 @@ const EditMultiplePosts: FC<EditMultiplePostsProps> = ({
         setPostsToUpdate(tempPosts)
     }
 
+    const storySearchInput = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        if (isStoriesOpen) storySearchInput.current?.focus()
+    }, [isStoriesOpen])
+
     return (
         <div className="">
             <Button isDisabled={isDisabled} onPress={onOpen}>
@@ -178,7 +184,12 @@ const EditMultiplePosts: FC<EditMultiplePostsProps> = ({
                                                             return 0
                                                         }}
                                                     >
-                                                        <CommandInput placeholder="Search stories..." />
+                                                        <CommandInput
+                                                            placeholder="Search stories..."
+                                                            ref={
+                                                                storySearchInput
+                                                            }
+                                                        />
                                                         <CommandEmpty>
                                                             No story found.
                                                         </CommandEmpty>
