@@ -291,6 +291,7 @@ const EditMultiplePosts: FC<EditMultiplePostsProps> = ({
                                                     delay={1000}
                                                 >
                                                     <Button
+                                                        tabIndex={-1}
                                                         onClick={() =>
                                                             removePost(p.id)
                                                         }

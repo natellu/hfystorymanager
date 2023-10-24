@@ -366,7 +366,7 @@ export async function ImportSinglePost(link: string) {
         storyId
     }: Post = { ...redditPost }
 
-    if (subreddit !== "HFY") throw new Error()
+    /* if (subreddit !== "HFY") throw new Error() */
 
     const postExist = await db.post.findFirst({
         where: {

@@ -215,6 +215,14 @@ const Page = () => {
                     }}
                 />
                 <div className="flex gap-3">
+                    <EditMultiplePosts
+                        refetchAllPosts={refetch}
+                        stories={stories}
+                        isDisabled={
+                            !selectedPosts || selectedPosts.length === 0
+                        }
+                        selectedPosts={selectedPosts}
+                    />
                     <Dropdown>
                         <DropdownTrigger className="hidden sm:flex">
                             <Button
@@ -399,16 +407,7 @@ const Page = () => {
                 bottomContentPlacement="outside"
                 bottomContent={
                     pages > 0 ? (
-                        <div className="flex justify-between w-full  ">
-                            <EditMultiplePosts
-                                refetchAllPosts={refetch}
-                                stories={stories}
-                                isDisabled={
-                                    !selectedPosts || selectedPosts.length === 0
-                                }
-                                selectedPosts={selectedPosts}
-                            />
-
+                        <div className="flex justify-between w-full">
                             <Pagination
                                 isCompact
                                 showControls
