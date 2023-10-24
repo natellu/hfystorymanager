@@ -300,7 +300,6 @@ const EditMultiplePosts: FC<EditMultiplePostsProps> = ({
                                                         color="danger"
                                                         aria-label="delete post from this list"
                                                         variant="bordered"
-                                                        tabIndex={-1}
                                                     >
                                                         <Trash2Icon />
                                                     </Button>
